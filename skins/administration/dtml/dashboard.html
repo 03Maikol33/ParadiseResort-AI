@@ -1,0 +1,98 @@
+<div class="page-heading mb-4">
+  <div class="page-heading-copy">
+    <span class="page-icon"><i class="bi bi-speedometer2" aria-hidden="true"></i></span>
+    <div>
+      <p class="eyebrow mb-1">Panoramica Generale</p>
+      <h1 class="h3 mb-1">Dashboard Management</h1>
+      <p class="text-muted mb-0">Riepilogo delle statistiche in tempo reale e delle ultime prenotazioni del resort.</p>
+    </div>
+  </div>
+  <div class="heading-actions">
+    <a href="<[base]>/<[role_path]>/bookings.php" class="btn btn-primary btn-sm"><i class="bi bi-calendar-plus me-1"></i> Gestisci Prenotazioni</a>
+  </div>
+</div>
+
+<section class="row g-3 mb-4" aria-label="Dashboard metrics">
+  <div class="col-12 col-sm-6 col-xl-3">
+    <article class="metric-card metric-primary p-3 bg-white shadow-sm rounded border">
+      <div class="metric-top d-flex justify-content-between align-items-center mb-2">
+        <span class="metric-label text-muted fw-bold">Prenotazioni Totali</span>
+        <span class="metric-icon p-2 bg-primary bg-opacity-10 rounded text-primary"><i class="bi bi-calendar-check fs-5"></i></span>
+      </div>
+      <div class="metric-value fs-3 fw-bold"><[stat_bookings]></div>
+      <div class="metric-meta text-muted small mt-1">Stanze e pacchetti attivi</div>
+    </article>
+  </div>
+
+  <div class="col-12 col-sm-6 col-xl-3">
+    <article class="metric-card metric-success p-3 bg-white shadow-sm rounded border">
+      <div class="metric-top d-flex justify-content-between align-items-center mb-2">
+        <span class="metric-label text-muted fw-bold">Incasso / Attese</span>
+        <span class="metric-icon p-2 bg-success bg-opacity-10 rounded text-success"><i class="bi bi-wallet2 fs-5"></i></span>
+      </div>
+      <div class="metric-value fs-3 fw-bold"><[stat_revenue]></div>
+      <div class="metric-meta text-muted small mt-1">Fatturato confermato</div>
+    </article>
+  </div>
+
+  <div class="col-12 col-sm-6 col-xl-3">
+    <article class="metric-card metric-info p-3 bg-white shadow-sm rounded border">
+      <div class="metric-top d-flex justify-content-between align-items-center mb-2">
+        <span class="metric-label text-muted fw-bold">Ospiti Registrati</span>
+        <span class="metric-icon p-2 bg-info bg-opacity-10 rounded text-info"><i class="bi bi-people fs-5"></i></span>
+      </div>
+      <div class="metric-value fs-3 fw-bold"><[stat_guests]></div>
+      <div class="metric-meta text-muted small mt-1">Clienti nel portale</div>
+    </article>
+  </div>
+
+  <div class="col-12 col-sm-6 col-xl-3">
+    <article class="metric-card metric-warning p-3 bg-white shadow-sm rounded border">
+      <div class="metric-top d-flex justify-content-between align-items-center mb-2">
+        <span class="metric-label text-muted fw-bold">Ticket Manutenzione</span>
+        <span class="metric-icon p-2 bg-warning bg-opacity-10 rounded text-warning"><i class="bi bi-tools fs-5"></i></span>
+      </div>
+      <div class="metric-value fs-3 fw-bold"><[stat_tickets]></div>
+      <div class="metric-meta text-muted small mt-1">Segnalazioni aperte o in corso</div>
+    </article>
+  </div>
+</section>
+
+<div class="card shadow-sm border-0 rounded mb-4">
+  <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+    <h5 class="mb-0 fw-bold"><i class="bi bi-clock-history me-2 text-primary"></i>Ultime Prenotazioni Ricevute</h5>
+    <a href="<[base]>/<[role_path]>/bookings.php" class="btn btn-sm btn-outline-primary">Vedi Tutte</a>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="bg-light">
+          <tr>
+            <th class="ps-4">ID</th>
+            <th>Ospite</th>
+            <th>Camera</th>
+            <th>Date Soggiorno</th>
+            <th>Prezzo Totale</th>
+            <th>Stato</th>
+            <th class="text-end pe-4">Azione</th>
+          </tr>
+        </thead>
+        <tbody>
+          <[foreach]>
+          <tr>
+            <td class="ps-4 fw-bold">#<[recent_bookings.id]></td>
+            <td><[recent_bookings.guest]></td>
+            <td><span class="badge bg-light text-dark border">Cam. <[recent_bookings.room]></span></td>
+            <td><[recent_bookings.dates]></td>
+            <td class="fw-bold"><[recent_bookings.price]></td>
+            <td><span class="<[recent_bookings.badge_class]>"><[recent_bookings.status_name]></span></td>
+            <td class="text-end pe-4">
+              <a href="<[base]>/<[role_path]>/bookings.php?search=<[recent_bookings.id]>" class="btn btn-sm btn-outline-secondary">Dettagli</a>
+            </td>
+          </tr>
+          <[/foreach]>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

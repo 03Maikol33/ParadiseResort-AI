@@ -1,0 +1,131 @@
+<!-- Hero Title -->
+<div class="slider-area d-print-none">
+    <div class="single-slider hero-overly slider-height2 d-flex align-items-center" style="background-image: url('<[base]>/skins/customers/assets/img/hero/contact_hero.jpg'); background-size: cover; background-position: center;">
+        <div class="container">
+            <div class="row justify-content-center text-center">
+                <div class="col-xl-9">
+                    <div class="h1-slider-caption">
+                        <h1 data-animation="fadeInUp" data-delay=".4s">Fattura & Ricevuta</h1>
+                        <h3 data-animation="fadeInDown" data-delay=".4s">Documento fiscale ufficiale del soggiorno</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="invoice-section pt-80 pb-90">
+    <div class="container">
+        <[if!empty success]>
+            <div class="alert alert-success alert-dismissible fade show d-print-none mb-4" role="alert">
+                <i class="fas fa-check-circle fs-5 me-2"></i> <[success]>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        <[/if!empty]>
+
+        <div class="card shadow-lg border-0 rounded p-5 mb-4" id="printableArea" style="background: #fff; border-top: 5px solid #d4af37 !important;">
+            <!-- Invoice Header -->
+            <div class="row border-bottom pb-4 mb-4 align-items-center">
+                <div class="col-sm-6">
+                    <img src="<[base]>/skins/customers/assets/img/logo/logo.png" alt="ParadiseResort" style="max-height: 55px;">
+                    <p class="text-muted small mt-2 mb-0">Via del Paradiso, 1 - 00100 Roma (IT)<br>P. IVA: IT01234567890 • Tel: +39 06 12345678</p>
+                </div>
+                <div class="col-sm-6 text-sm-right mt-3 mt-sm-0">
+                    <h3 class="font-weight-bold text-dark mb-1">FATTURA / RICEVUTA</h3>
+                    <h5 class="text-primary font-monospace mb-2"><[invoice.number]></h5>
+                    <p class="text-muted small mb-1">Data Emissione: <strong><[invoice.issued_date]></strong></p>
+                    <span class="badge badge-success px-3 py-2 fs-6"><i class="fas fa-check me-1"></i> Stato: <[invoice.status_name]></span>
+                </div>
+            </div>
+
+            <!-- Guest & Booking Info -->
+            <div class="row mb-5">
+                <div class="col-sm-6">
+                    <h6 class="font-weight-bold text-uppercase text-muted small mb-2">Intestato A (Ospite):</h6>
+                    <h4 class="font-weight-bold text-dark mb-1"><[guest.name]></h4>
+                    <p class="text-muted mb-0"><i class="fas fa-envelope me-2"></i> <[guest.email]><br><i class="fas fa-phone me-2"></i> <[guest.phone]></p>
+                </div>
+                <div class="col-sm-6 text-sm-right mt-4 mt-sm-0">
+                    <h6 class="font-weight-bold text-uppercase text-muted small mb-2">Dettaglio Sistemazione:</h6>
+                    <h5 class="font-weight-bold text-dark mb-1"><[room.category_name]> <span class="badge badge-secondary">Cam. <[room.number]></span></h5>
+                    <p class="text-muted mb-0"><i class="far fa-calendar-alt me-2"></i> Periodo Soggiorno:<br><strong><[room.dates]></strong></p>
+                </div>
+            </div>
+
+            <!-- Itemized Table -->
+            <div class="table-responsive mb-5">
+                <table class="table table-bordered align-middle">
+                    <thead class="bg-light text-dark">
+                        <tr>
+                            <th class="py-3">Descrizione Voce di Costo</th>
+                            <th class="py-3 text-center">Quantità / Durata</th>
+                            <th class="py-3 text-right">Importo (€)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="py-3">
+                                <strong class="d-block text-dark">Soggiorno in <[room.category_name]> (Camera <[room.number]>)</strong>
+                                <small class="text-muted">Pernottamento con servizi base inclusi e accesso termale</small>
+                            </td>
+                            <td class="py-3 text-center"><[room.dates]></td>
+                            <td class="py-3 text-right font-weight-bold">€ <[room.subtotal]></td>
+                        </tr>
+                        <[foreach]>
+                        <tr>
+                            <td class="py-3">
+                                <strong class="d-block text-dark"><[extras_list.name]></strong>
+                                <small class="text-muted">Servizio Extra / Amenities facoltativo selezionato</small>
+                            </td>
+                            <td class="py-3 text-center">1 Servizio</td>
+                            <td class="py-3 text-right font-weight-bold">€ <[extras_list.price]></td>
+                        </tr>
+                        <[/foreach]>
+                    </tbody>
+                    <tfoot class="bg-light">
+                        <tr>
+                            <th colspan="2" class="text-right py-3 fs-5">TOTALE COMPLESSIVO DA PAGARE</th>
+                            <th class="text-right py-3 text-primary fs-4 font-weight-bold">€ <[invoice.grand_total]></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <!-- Invoice Footer & Bank details -->
+            <div class="row align-items-center pt-3 border-top">
+                <div class="col-sm-8">
+                    <small class="text-muted d-block">Coordinate Bancarie per eventuali bonifici: <strong>IT99X0123456789012345678901</strong> (Banca Nazionale Paradiso)</small>
+                    <small class="text-muted d-block mt-1">Grazie per aver scelto ParadiseResort. Ti auguriamo un soggiorno piacevole!</small>
+                </div>
+                <div class="col-sm-4 text-sm-right mt-3 mt-sm-0">
+                    <img src="<[base]>/skins/customers/assets/img/logo/timbro.png" alt="Timbro Ufficiale" style="max-height: 65px; opacity: 0.8;" onerror="this.style.display='none'">
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons (Hidden on Print) -->
+        <div class="text-center d-print-none mt-4">
+            <button onclick="window.print();" class="btn btn1 py-3 px-5 mr-3 font-weight-bold"><i class="fas fa-print me-2"></i> Stampa / Scarica in PDF</button>
+            <a href="<[base]>/profile.php" class="btn border-btn py-3 px-5 font-weight-bold"><i class="fas fa-user me-2"></i> Vai alla tua Area Personale</a>
+        </div>
+    </div>
+</section>
+<style>
+@media print {
+    .d-print-none, header, footer, .slider-area {
+        display: none !important;
+    }
+    body, .invoice-section, .container {
+        padding: 0 !important;
+        margin: 0 !important;
+        background: #fff !important;
+        width: 100% !important;
+    }
+    .card {
+        box-shadow: none !important;
+        border: none !important;
+    }
+}
+</style>

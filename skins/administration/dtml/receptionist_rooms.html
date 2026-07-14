@@ -1,0 +1,129 @@
+<div class="page-heading mb-4 d-flex justify-content-between align-items-center">
+  <div class="page-heading-copy">
+    <span class="page-icon"><i class="bi bi-door-closed-fill"></i></span>
+    <div>
+      <p class="eyebrow mb-1">Housekeeping & Controllo Alloggi</p>
+      <h1 class="h3 mb-1">Stato Operativo Camere & Pulizie</h1>
+      <p class="text-muted mb-0">Indici real-time di disponibilità, stanze occupate, da pulire (Dirty) o in manutenzione straordinaria.</p>
+    </div>
+  </div>
+  <div>
+    <a href="<[base]>/receptionist/segnalazioni.php" class="btn btn-outline-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i> Segnalazione Guasto</a>
+  </div>
+</div>
+
+<[if!empty message]>
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="bi bi-check-circle-fill me-2"></i> <[message]>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+<[/if!empty]>
+
+<[if!empty error]>
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i> <[error]>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+<[/if!empty]>
+
+<!-- Summary Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card shadow-sm border-0 rounded bg-success bg-opacity-10 p-3 text-center">
+      <h6 class="text-success text-uppercase small fw-bold mb-1"><i class="bi bi-check-circle me-1"></i> Disponibili / Pulite</h6>
+      <h2 class="fw-bold text-success mb-0"><[count_available]></h2>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card shadow-sm border-0 rounded bg-danger bg-opacity-10 p-3 text-center">
+      <h6 class="text-danger text-uppercase small fw-bold mb-1"><i class="bi bi-person-fill me-1"></i> Occupate</h6>
+      <h2 class="fw-bold text-danger mb-0"><[count_occupied]></h2>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card shadow-sm border-0 rounded bg-secondary bg-opacity-10 p-3 text-center">
+      <h6 class="text-secondary text-uppercase small fw-bold mb-1"><i class="bi bi-bucket me-1"></i> Da Pulire (Dirty)</h6>
+      <h2 class="fw-bold text-secondary mb-0"><[count_dirty]></h2>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card shadow-sm border-0 rounded bg-warning bg-opacity-10 p-3 text-center">
+      <h6 class="text-dark text-uppercase small fw-bold mb-1"><i class="bi bi-tools me-1"></i> Manutenzione</h6>
+      <h2 class="fw-bold text-dark mb-0"><[count_maintenance]></h2>
+    </div>
+  </div>
+</div>
+
+<!-- Search & Filter Bar -->
+<div class="card shadow-sm border-0 rounded mb-4 p-3 bg-white">
+  <form action="<[base]>/receptionist/rooms.php" method="GET" class="row g-2 align-items-center">
+    <div class="col-md-6">
+      <div class="input-group">
+        <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+        <input type="text" name="search" class="form-control border-start-0" placeholder="Cerca numero o categoria camera..." value="<[val_search]>">
+      </div>
+    </div>
+    <div class="col-md-4">
+      <select name="status" class="form-select">
+        <option value="">Tutti gli stati</option>
+        <option value="Available" <[sel_avail]>>Available (Disponibile)</option>
+        <option value="Occupied" <[sel_occ]>>Occupied (Occupata)</option>
+        <option value="Dirty" <[sel_dirty]>>Dirty (Da Pulire)</option>
+        <option value="Maintenance" <[sel_maint]>>Maintenance (Guasto)</option>
+      </select>
+    </div>
+    <div class="col-md-2 d-flex gap-2">
+      <button type="submit" class="btn btn-primary fw-bold flex-grow-1"><i class="bi bi-filter me-1"></i> Filtra</button>
+      <a href="<[base]>/receptionist/rooms.php" class="btn btn-outline-secondary" title="Reset"><i class="bi bi-arrow-counterclockwise"></i></a>
+    </div>
+  </form>
+</div>
+
+<!-- Table -->
+<div class="card shadow-sm border-0 rounded">
+  <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+    <h6 class="mb-0 fw-bold"><i class="bi bi-grid-fill me-2 text-primary"></i>Elenco Operativo Stanze</h6>
+    <span class="badge bg-light text-dark border">Housekeeping Control</span>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="bg-light">
+          <tr>
+            <th class="ps-4">Stanza</th>
+            <th>Piano</th>
+            <th>Categoria & Capienza</th>
+            <th>Stato Attuale</th>
+            <th class="text-end pe-4" style="width: 250px;">Cambia Stato / Pulizia</th>
+          </tr>
+        </thead>
+        <tbody>
+          <[foreach]>
+          <tr>
+            <td class="ps-4 fw-bold fs-6 text-primary"><i class="bi bi-key me-1"></i> Cam. <[room_rows.number]></td>
+            <td>Piano <[room_rows.floor]></td>
+            <td>
+              <strong class="d-block text-dark"><[room_rows.category_name]></strong>
+              <small class="text-muted"><i class="bi bi-people me-1"></i> Max <[room_rows.capacity]> ospiti</small>
+            </td>
+            <td><[room_rows.status_badge]></td>
+            <td class="text-end pe-4">
+              <form action="<[base]>/receptionist/rooms.php" method="POST" class="d-flex gap-1 justify-content-end">
+                <input type="hidden" name="action" value="change_room_status">
+                <input type="hidden" name="room_id" value="<[room_rows.id]>">
+                <select name="status" class="form-select form-select-sm" style="width: 145px;">
+                  <option value="Available" <[room_rows.sel_avail]>>Available (Pulita)</option>
+                  <option value="Dirty" <[room_rows.sel_dirty]>>Dirty (Da Pulire)</option>
+                  <option value="Occupied" <[room_rows.sel_occ]>>Occupied (Occupata)</option>
+                  <option value="Maintenance" <[room_rows.sel_maint]>>Maintenance</option>
+                </select>
+                <button type="submit" class="btn btn-sm btn-primary" title="Aggiorna"><i class="bi bi-check2"></i></button>
+              </form>
+            </td>
+          </tr>
+          <[/foreach]>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

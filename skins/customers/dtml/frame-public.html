@@ -1,0 +1,215 @@
+<!doctype html>
+<html class="no-js" lang="it">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>ParadiseResort - Luxury Hotel & Resort</title>
+    <meta name="description" content="Esclusivo resort di lusso per le tue vacanze da sogno">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="shortcut icon" type="image/x-icon" href="<[base]>/skins/customers/assets/img/favicon.ico">
+
+    <!-- CSS here -->
+    <link rel="stylesheet" href="<[base]>/skins/customers/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="<[base]>/skins/customers/assets/css/owl.carousel.min.css">
+    <link rel="stylesheet" href="<[base]>/skins/customers/assets/css/gijgo.css">
+    <link rel="stylesheet" href="<[base]>/skins/customers/assets/css/slicknav.css">
+    <link rel="stylesheet" href="<[base]>/skins/customers/assets/css/animate.min.css">
+    <link rel="stylesheet" href="<[base]>/skins/customers/assets/css/magnific-popup.css">
+    <link rel="stylesheet" href="<[base]>/skins/customers/assets/css/fontawesome-all.min.css">
+    <link rel="stylesheet" href="<[base]>/skins/customers/assets/css/themify-icons.css">
+    <link rel="stylesheet" href="<[base]>/skins/customers/assets/css/slick.css">
+    <link rel="stylesheet" href="<[base]>/skins/customers/assets/css/nice-select.css">
+    <link rel="stylesheet" href="<[base]>/skins/customers/assets/css/style.css">
+    <link rel="stylesheet" href="<[base]>/skins/customers/assets/css/responsive.css">
+    <style>
+        .cart-badge {
+            font-size: 0.75rem;
+            padding: 0.25em 0.5em;
+            border-radius: 50%;
+            vertical-align: top;
+            margin-left: 4px;
+        }
+        .header-btn .btn1 {
+            padding: 18px 25px;
+        }
+        .user-nav-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Preloader Start -->
+    <div id="preloader-active">
+        <div class="preloader d-flex align-items-center justify-content-center">
+            <div class="preloader-inner position-relative">
+                <div class="preloader-circle"></div>
+                <div class="preloader-img pere-text">
+                    <strong>ParadiseResort</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Preloader Start -->
+
+    <header>
+        <!-- Header Start -->
+       <div class="header-area header-sticky">
+            <div class="main-header ">
+                <div class="container">
+                    <div class="row align-items-center">
+                        <!-- logo -->
+                        <div class="col-xl-2 col-lg-2">
+                            <div class="logo">
+                               <a href="<[base]>/index.php"><img src="<[base]>/skins/customers/assets/img/logo/logo.png" alt="ParadiseResort"></a>
+                            </div>
+                        </div>
+                        <div class="col-xl-8 col-lg-8">
+                            <!-- main-menu -->
+                            <div class="main-menu f-right d-none d-lg-block">
+                                <nav>
+                                    <ul id="navigation">                                                                                                                                     
+                                        <li><a href="<[base]>/index.php">Home</a></li>
+                                        <li><a href="<[base]>/rooms.php">Camere</a></li>
+                                        <li><a href="<[base]>/services.php">Servizi Extra</a></li>
+                                        <li><a href="#">Esperienze <i class="fas fa-angle-down"></i></a>
+                                            <ul class="submenu">
+                                                <li><a href="<[base]>/restaurant.php">Ristorante & Menu</a></li>
+                                                <li><a href="<[base]>/pools.php">Piscine & Terme</a></li>
+                                                <li><a href="<[base]>/reviews.php">Recensioni Clienti</a></li>
+                                            </ul>
+                                        </li>
+                                        <li><a href="<[base]>/report-ticket.php">Assistenza Guasti</a></li>
+                                        <li><a href="<[base]>/cart.php"><i class="fas fa-shopping-cart"></i> Carrello <[cart_badge]></a></li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>             
+                        <div class="col-xl-2 col-lg-2">
+                            <!-- header-btn -->
+                            <div class="header-btn">
+                                <[if!empty is_logged]>
+                                    <div class="dropdown d-inline-block">
+                                        <a href="<[base]>/profile.php" class="btn btn1 dropdown-toggle" id="userMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="padding: 14px 20px;">
+                                            <i class="fas fa-user me-1"></i> Area Personale
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userMenu">
+                                            <h6 class="dropdown-header text-primary"><[user_name]></h6>
+                                            <a class="dropdown-item" href="<[base]>/profile.php"><i class="fas fa-calendar-check me-2"></i> Le mie Prenotazioni</a>
+                                            <a class="dropdown-item" href="<[base]>/cart.php"><i class="fas fa-shopping-cart me-2"></i> Carrello <[cart_badge]></a>
+                                            <[user_role_link]>
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item text-danger" href="<[base]>/logout.php"><i class="fas fa-sign-out-alt me-2"></i> Esci</a>
+                                        </div>
+                                    </div>
+                                <[/if!empty]>
+                                <[ifempty is_logged]>
+                                    <a href="<[base]>/login.php" class="btn btn1 d-none d-lg-block">Accedi / Registrati</a>
+                                <[/ifempty]>
+                            </div>
+                        </div>
+                        <!-- Mobile Menu -->
+                        <div class="col-12">
+                            <div class="mobile_menu d-block d-lg-none"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+       </div>
+        <!-- Header End -->
+    </header>
+
+    <main>
+        <[body]>
+    </main>
+
+    <footer>
+       <!-- Footer Start-->
+       <div class="footer-area black-bg footer-padding">
+           <div class="container">
+               <div class="row d-flex justify-content-between">
+                   <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
+                      <div class="single-footer-caption mb-30">
+                         <!-- logo -->
+                         <div class="footer-logo">
+                           <a href="<[base]>/index.php"><img src="<[base]>/skins/customers/assets/img/logo/logo2_footer.png" alt="ParadiseResort"></a>
+                         </div>
+                         <div class="footer-social footer-social2">
+                             <a href="#"><i class="fab fa-facebook-f"></i></a>
+                             <a href="#"><i class="fab fa-twitter"></i></a>
+                             <a href="#"><i class="fas fa-globe"></i></a>
+                             <a href="#"><i class="fab fa-behance"></i></a>
+                         </div>
+                         <div class="footer-pera">
+                              <p>L'apice del lusso e del comfort sulla costa paradisiaca. Servizi esclusivi per un soggiorno indimenticabile.</p>
+                         </div>
+                      </div>
+                   </div>
+                   <div class="col-xl-3 col-lg-3 col-md-3 col-sm-5">
+                       <div class="single-footer-caption mb-30">
+                           <div class="footer-tittle">
+                               <h4>Link Rapidi</h4>
+                               <ul>
+                                   <li><a href="<[base]>/rooms.php">Le Nostre Camere</a></li>
+                                   <li><a href="<[base]>/services.php">Servizi & SPA</a></li>
+                                   <li><a href="<[base]>/restaurant.php">Ristorante</a></li>
+                                   <li><a href="<[base]>/pools.php">Piscine</a></li>
+                                   <li><a href="<[base]>/reviews.php">Recensioni</a></li>
+                               </ul>
+                           </div>
+                       </div>
+                   </div>
+                   <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3">
+                       <div class="single-footer-caption mb-30">
+                           <div class="footer-tittle">
+                               <h4>Prenotazioni</h4>
+                               <ul>
+                                   <li><a href="<[base]>/cart.php">Carrello Prenotazioni</a></li>
+                                   <li><a href="<[base]>/profile.php">Storico Viaggi</a></li>
+                                   <li><a href="<[base]>/report-ticket.php">Segnalazioni Guasti</a></li>
+                               </ul>
+                           </div>
+                       </div>
+                   </div>
+                   <div class="col-xl-3 col-lg-3 col-md-4  col-sm-5">
+                       <div class="single-footer-caption mb-30">
+                           <div class="footer-tittle">
+                               <h4>Contatti Resort</h4>
+                               <ul>
+                                   <li><a href="#">+39 06 12345678</a></li>
+                                   <li><a href="#">concierge@paradiseresort.it</a></li>
+                                   <li><a href="#">Via del Paradiso, 1 - 00100 Roma</a></li>
+                               </ul>
+                           </div>
+                       </div>
+                   </div>
+               </div>
+           </div>
+       </div>
+       <!-- Footer End-->
+   </footer>
+
+    <!-- JS here -->
+    <script src="<[base]>/skins/customers/assets/js/vendor/modernizr-3.5.0.min.js"></script>
+    <script src="<[base]>/skins/customers/assets/js/vendor/jquery-1.12.4.min.js"></script>
+    <script src="<[base]>/skins/customers/assets/js/popper.min.js"></script>
+    <script src="<[base]>/skins/customers/assets/js/bootstrap.min.js"></script>
+    <script src="<[base]>/skins/customers/assets/js/jquery.slicknav.min.js"></script>
+
+    <script src="<[base]>/skins/customers/assets/js/owl.carousel.min.js"></script>
+    <script src="<[base]>/skins/customers/assets/js/slick.min.js"></script>
+    <script src="<[base]>/skins/customers/assets/js/gijgo.min.js"></script>
+    <script src="<[base]>/skins/customers/assets/js/wow.min.js"></script>
+    <script src="<[base]>/skins/customers/assets/js/animated.headline.js"></script>
+    <script src="<[base]>/skins/customers/assets/js/jquery.magnific-popup.js"></script>
+
+    <script src="<[base]>/skins/customers/assets/js/jquery.scrollUp.min.js"></script>
+    <script src="<[base]>/skins/customers/assets/js/jquery.nice-select.min.js"></script>
+    <script src="<[base]>/skins/customers/assets/js/jquery.sticky.js"></script>
+    
+    <script src="<[base]>/skins/customers/assets/js/plugins.js"></script>
+    <script src="<[base]>/skins/customers/assets/js/main.js"></script>
+</body>
+</html>

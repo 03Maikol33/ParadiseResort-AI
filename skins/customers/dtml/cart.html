@@ -1,0 +1,176 @@
+<!-- Hero Title -->
+<div class="slider-area ">
+    <div class="single-slider hero-overly slider-height2 d-flex align-items-center" style="background-image: url('<[base]>/skins/customers/assets/img/hero/contact_hero.jpg'); background-size: cover; background-position: center;">
+        <div class="container">
+            <div class="row justify-content-center text-center">
+                <div class="col-xl-9">
+                    <div class="h1-slider-caption">
+                        <h1 data-animation="fadeInUp" data-delay=".4s">Carrello Prenotazioni</h1>
+                        <h3 data-animation="fadeInDown" data-delay=".4s">Riepilogo e conferma finale del tuo soggiorno</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="cart-section pt-80 pb-90">
+    <div class="container">
+        <[if!empty message]>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i> <[message]>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        <[/if!empty]>
+
+        <[if!empty error]>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i> <[error]>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        <[/if!empty]>
+
+        <[ifempty has_items]>
+            <div class="card shadow-sm border-0 rounded text-center p-5 bg-light">
+                <div class="mb-3">
+                    <i class="fas fa-shopping-cart text-muted" style="font-size: 4rem;"></i>
+                </div>
+                <h3 class="font-weight-bold mb-3">Il tuo carrello è attualmente vuoto</h3>
+                <p class="text-muted mb-4">Non hai ancora selezionato alcuna camera per il tuo soggiorno da sogno al resort.</p>
+                <div>
+                    <a href="<[base]>/rooms.php" class="btn btn1 py-3 px-5"><i class="fas fa-search me-2"></i> Esplora le Camere Disponibili</a>
+                </div>
+            </div>
+        <[/ifempty]>
+
+        <[if!empty has_items]>
+            <form action="<[base]>/checkout.php" method="POST">
+                <div class="row">
+                    <!-- Cart Items Column -->
+                    <div class="col-lg-8 mb-5 mb-lg-0">
+                        <div class="card shadow-sm border-0 rounded overflow-hidden mb-4">
+                            <div class="card-header bg-dark text-white py-3 d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0 fw-bold"><i class="fas fa-bed me-2"></i> Sistemazioni Selezionate</h5>
+                                <a href="<[base]>/cart.php?empty=1" class="btn btn-sm btn-outline-light" onclick="return confirm('Vuoi davvero svuotare tutto il carrello?');"><i class="fas fa-trash me-1"></i> Svuota Carrello</a>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead class="bg-light">
+                                            <tr>
+                                                <th class="ps-4">Sistemazione</th>
+                                                <th>Camera</th>
+                                                <th>Date e Notti</th>
+                                                <th>Scadenza</th>
+                                                <th>Subtotale</th>
+                                                <th class="text-end pe-4">Rimuovi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <[foreach]>
+                                            <tr>
+                                                <td class="ps-4">
+                                                    <div class="d-flex align-items-center">
+                                                        <img src="<[base]>/skins/customers/assets/img/rooms/<[cart_list.image_url]>" class="rounded me-3 shadow-sm" style="width: 65px; height: 50px; object-fit: cover;" alt="">
+                                                        <div>
+                                                            <strong class="d-block text-dark"><[cart_list.category_name]></strong>
+                                                            <small class="text-muted">Prenotazione #<[cart_list.id]></small>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td><span class="badge badge-secondary py-1 px-2">Cam. <[cart_list.room_number]></span></td>
+                                                <td class="small font-weight-bold"><[cart_list.dates]></td>
+                                                <td>
+                                                    <span class="badge badge-warning text-dark py-1 px-2"><i class="far fa-clock me-1"></i> <[cart_list.expires_in]> min</span>
+                                                </td>
+                                                <td class="font-weight-bold text-primary">€ <[cart_list.price]></td>
+                                                <td class="text-end pe-4">
+                                                    <a href="<[base]>/cart.php?remove_id=<[cart_list.id]>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Rimuovere questa camera dal carrello?');" title="Rimuovi dal carrello">
+                                                        <i class="fas fa-times"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            <[/foreach]>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Extra Amenities Box -->
+                        <div class="card shadow-sm border-0 rounded p-4 mb-4 bg-light">
+                            <h5 class="font-weight-bold mb-3"><i class="fas fa-gift text-primary me-2"></i> Servizi Extra & Esperienze su Misura (Facoltativi)</h5>
+                            <p class="text-muted small mb-3">Seleziona eventuali servizi opzionali da aggiungere a tutto il soggiorno. Saranno calcolati in fattura al momento del check-out.</p>
+                            <div class="row">
+                                <[foreach]>
+                                <div class="col-md-6 mb-3">
+                                    <div class="custom-control custom-checkbox p-3 bg-white border rounded shadow-sm d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <input type="checkbox" class="custom-control-input" id="extra_<[extra_amenities.id]>" name="extras[<[extra_amenities.id]>]" value="1" style="width: 18px; height: 18px;">
+                                            <label class="custom-control-label font-weight-bold ml-2 text-dark" for="extra_<[extra_amenities.id]>"><[extra_amenities.name]></label>
+                                            <small class="text-muted d-block ml-4"><[extra_amenities.description]></small>
+                                        </div>
+                                        <span class="badge badge-info py-2 px-2">+ € <[extra_amenities.price]></span>
+                                    </div>
+                                </div>
+                                <[/foreach]>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Payment & Confirmation (US-16 & US-17) -->
+                    <div class="col-lg-4">
+                        <div class="card shadow-lg border-0 rounded p-4 sticky-top" style="top: 100px; background: #fff;">
+                            <h4 class="font-weight-bold mb-3 border-bottom pb-3 text-center">Riepilogo Ordine</h4>
+                            
+                            <div class="d-flex justify-content-between mb-3">
+                                <span class="text-muted">Totale Camere</span>
+                                <span class="font-weight-bold fs-5">€ <[grand_total]></span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-3">
+                                <span class="text-muted">Servizi Extra</span>
+                                <span class="text-success small">Calcolati a fine ordine</span>
+                            </div>
+                            <div class="d-flex justify-content-between border-top pt-3 mb-4">
+                                <span class="font-weight-bold fs-4">Totale da Pagare</span>
+                                <span class="text-primary font-weight-bold fs-3">€ <[grand_total]></span>
+                            </div>
+
+                            <!-- Payment Selection (US-16) -->
+                            <h5 class="font-weight-bold mb-3"><i class="fas fa-credit-card text-primary me-2"></i> Metodo di Pagamento *</h5>
+                            
+                            <div class="form-group mb-3">
+                                <div class="custom-control custom-radio mb-2 p-3 border rounded bg-light">
+                                    <input type="radio" id="pay_resort" name="payment_method" value="Resort" class="custom-control-input" checked style="width:16px; height:16px;">
+                                    <label class="custom-control-label font-weight-bold ml-2 text-dark" for="pay_resort">Pagamento al Check-In in Resort</label>
+                                    <small class="text-muted d-block ml-4">Nessun addebito ora. Paga all'arrivo al banco reception.</small>
+                                </div>
+                                <div class="custom-control custom-radio mb-2 p-3 border rounded bg-light">
+                                    <input type="radio" id="pay_card" name="payment_method" value="Carta" class="custom-control-input" style="width:16px; height:16px;">
+                                    <label class="custom-control-label font-weight-bold ml-2 text-dark" for="pay_card">Carta di Credito / Debito Online</label>
+                                    <small class="text-muted d-block ml-4">Conferma immediata con Visa, Mastercard o American Express.</small>
+                                </div>
+                                <div class="custom-control custom-radio p-3 border rounded bg-light">
+                                    <input type="radio" id="pay_bank" name="payment_method" value="Bonifico" class="custom-control-input" style="width:16px; height:16px;">
+                                    <label class="custom-control-label font-weight-bold ml-2 text-dark" for="pay_bank">Bonifico Bancario Anticipato</label>
+                                    <small class="text-muted d-block ml-4">Riceverai le coordinate bancarie per il bonifico in fattura.</small>
+                                </div>
+                            </div>
+
+                            <div class="form-group form-check mb-4 mt-3">
+                                <input type="checkbox" class="form-check-input" id="terms" required style="width: 18px; height: 18px;">
+                                <label class="form-check-label ml-2 pt-1 small font-weight-bold" for="terms">Accetto i Termini di Servizio e le Politiche di Cancellazione *</label>
+                            </div>
+
+                            <button type="submit" class="btn btn1 w-100 py-3 font-weight-bold" style="font-size: 1.15rem;"><i class="fas fa-check-circle me-2"></i> Conferma & Genera Fattura</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        <[/if!empty]>
+    </div>
+</section>

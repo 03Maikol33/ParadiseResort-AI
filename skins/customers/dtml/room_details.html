@@ -1,0 +1,98 @@
+<!-- Hero Title -->
+<div class="slider-area ">
+    <div class="single-slider hero-overly slider-height2 d-flex align-items-center" style="background-image: url('<[base]>/skins/customers/assets/img/hero/contact_hero.jpg'); background-size: cover; background-position: center;">
+        <div class="container">
+            <div class="row justify-content-center text-center">
+                <div class="col-xl-9">
+                    <div class="h1-slider-caption">
+                        <h1 data-animation="fadeInUp" data-delay=".4s"><[room.name]></h1>
+                        <h3 data-animation="fadeInDown" data-delay=".4s">Dettaglio Sistemazione & Servizi Esclusivi</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="room-details-area pt-80 pb-90">
+    <div class="container">
+        <div class="row">
+            <!-- Left Content: Photos & Description -->
+            <div class="col-lg-8 mb-5 mb-lg-0">
+                <div class="card shadow-sm border-0 rounded overflow-hidden mb-4">
+                    <img src="<[base]>/skins/customers/assets/img/rooms/<[room.image_url]>" class="img-fluid w-100" alt="<[room.name]>" style="max-height: 480px; object-fit: cover;">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h2 class="font-weight-bold mb-0"><[room.name]></h2>
+                            <span class="badge badge-primary py-2 px-3 fs-6"><i class="fas fa-users me-1"></i> Capienza Max: <[room.capacity]> Ospiti</span>
+                        </div>
+                        <h4 class="text-primary font-weight-bold mb-4">Prezzo Base: € <[room.base_price]> <small class="text-muted font-weight-normal">/ notte (tasse incluse)</small></h4>
+                        
+                        <h5 class="font-weight-bold mt-4 mb-3 border-bottom pb-2">Descrizione Completa</h5>
+                        <p class="text-muted" style="line-height: 1.8; font-size: 1.05rem;"><[room.description]></p>
+                    </div>
+                </div>
+
+                <!-- Amenities Box -->
+                <div class="card shadow-sm border-0 rounded p-4 bg-light">
+                    <h4 class="font-weight-bold mb-4"><i class="fas fa-concierge-bell text-primary me-2"></i> Servizi Esclusivi & Extra Disponibili</h4>
+                    <div class="row">
+                        <[foreach]>
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex justify-content-between align-items-center p-3 bg-white border rounded shadow-sm">
+                                <div>
+                                    <h6 class="font-weight-bold mb-1"><[amenity_list.name]></h6>
+                                    <small class="text-muted d-block"><[amenity_list.description]></small>
+                                </div>
+                                <div>
+                                    <[amenity_list.badge]>
+                                </div>
+                            </div>
+                        </div>
+                        <[/foreach]>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Content: Booking Form Card -->
+            <div class="col-lg-4">
+                <div class="card shadow-lg border-0 rounded p-4 sticky-top" style="top: 100px; background: #fff;">
+                    <h4 class="font-weight-bold mb-3 text-center border-bottom pb-3">Prenota questa Camera</h4>
+                    <p class="text-muted small text-center mb-4">Seleziona le date di check-in e check-out per verificare le camere disponibili e metterle in carrello</p>
+
+                    <form action="<[base]>/cart_add.php" method="POST">
+                        <input type="hidden" name="room_category_id" value="<[room.id]>">
+
+                        <div class="form-group mb-3">
+                            <label class="font-weight-bold small text-dark"><i class="far fa-calendar-alt text-primary me-1"></i> Data di Check-in *</label>
+                            <input type="date" name="check_in_date" class="form-control py-3" value="<[val_check_in]>" required>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label class="font-weight-bold small text-dark"><i class="far fa-calendar-check text-primary me-1"></i> Data di Check-out *</label>
+                            <input type="date" name="check_out_date" class="form-control py-3" value="<[val_check_out]>" required>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label class="font-weight-bold small text-dark"><i class="fas fa-user-friends text-primary me-1"></i> Numero Ospiti *</label>
+                            <select name="guests_count" class="form-control py-2" required>
+                                <option value="1">1 Ospite</option>
+                                <option value="2" selected>2 Ospiti</option>
+                                <option value="3">3 Ospiti</option>
+                                <option value="4">4 Ospiti</option>
+                                <option value="5">5 Ospiti</option>
+                                <option value="6">6 Ospiti</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn1 w-100 py-3 font-weight-bold" style="font-size: 1.1rem;"><i class="fas fa-shopping-cart me-2"></i> Verifica & Aggiungi al Carrello</button>
+                    </form>
+
+                    <div class="text-center mt-4 pt-3 border-top">
+                        <small class="text-muted"><i class="fas fa-shield-alt text-success me-1"></i> Nessun addebito immediato. Pagherai solo dopo la conferma al check-in.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

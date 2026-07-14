@@ -1,0 +1,109 @@
+<div class="page-heading mb-4 d-flex justify-content-between align-items-center">
+  <div class="page-heading-copy">
+    <span class="page-icon"><i class="bi bi-person-badge-fill"></i></span>
+    <div>
+      <p class="eyebrow mb-1">Organigramma & Gerarchia</p>
+      <h1 class="h3 mb-1">Gestione Staff Aziendale</h1>
+      <p class="text-muted mb-0">Crea e gestisci gli account di Amministratori e Receptionist per stabilire la gerarchia organizzativa.</p>
+    </div>
+  </div>
+</div>
+
+<[if!empty message]>
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="bi bi-check-circle-fill me-2"></i> <[message]>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+<[/if!empty]>
+
+<[if!empty error]>
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i> <[error]>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+<[/if!empty]>
+
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card shadow-sm border-0 rounded">
+      <div class="card-header bg-primary text-white py-3">
+        <h6 class="mb-0 fw-bold"><i class="bi bi-person-plus me-2"></i> Registra Nuovo Staff</h6>
+      </div>
+      <div class="card-body p-4">
+        <form action="<[base]>/admin/staff.php" method="POST">
+          <input type="hidden" name="action" value="create_staff">
+          
+          <div class="mb-3">
+            <label class="form-label fw-bold small">Nome *</label>
+            <input type="text" name="first_name" class="form-control" placeholder="Es. Giulia" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold small">Cognome *</label>
+            <input type="text" name="last_name" class="form-control" placeholder="Es. Bianchi" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold small">Indirizzo Email *</label>
+            <input type="email" name="email" class="form-control" placeholder="reception@paradise.com" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold small">Telefono</label>
+            <input type="text" name="phone" class="form-control" placeholder="+39 349 1234567">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold small">Password Temporanea *</label>
+            <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+          </div>
+          <div class="mb-4">
+            <label class="form-label fw-bold small">Ruolo Aziendale (Gerarchia) *</label>
+            <select name="group_id" class="form-select" required>
+              <option value="2">Receptionist (Gestione Operativa e Arrivi)</option>
+              <option value="1">Amministratore (Accesso Totale al Sistema)</option>
+            </select>
+          </div>
+          
+          <button type="submit" class="btn btn-primary w-100 fw-bold py-2"><i class="bi bi-check2-circle me-2"></i> Crea e Assegna Ruolo</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="card shadow-sm border-0 rounded">
+      <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 fw-bold"><i class="bi bi-person-lines-fill me-2 text-primary"></i>Membri Attivi del Personale</h6>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light">
+              <tr>
+                <th class="ps-4">ID</th>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Telefono</th>
+                <th>Ruolo Assegnato</th>
+                <th class="text-end pe-4">Azione</th>
+              </tr>
+            </thead>
+            <tbody>
+              <[foreach]>
+              <tr>
+                <td class="ps-4 fw-bold">#<[staff_list.id]></td>
+                <td class="fw-bold"><[staff_list.name]></td>
+                <td><[staff_list.email]></td>
+                <td><[staff_list.phone]></td>
+                <td><span class="badge <[staff_list.badge_color]>"><[staff_list.group_name]></span></td>
+                <td class="text-end pe-4">
+                  <a href="<[base]>/admin/staff.php?remove_role_user=<[staff_list.id]>&remove_role_group=<[staff_list.group_id]>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Vuoi rimuovere il ruolo di <[staff_list.group_name]> per questo utente?');" title="Rimuovi questo ruolo">
+                    <i class="bi bi-x-circle"></i>
+                  </a>
+                </td>
+              </tr>
+              <[/foreach]>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,86 @@
+<!-- Hero Title -->
+<div class="slider-area ">
+    <div class="single-slider hero-overly slider-height2 d-flex align-items-center" style="background-image: url('<[base]>/skins/customers/assets/img/hero/contact_hero.jpg'); background-size: cover; background-position: center;">
+        <div class="container">
+            <div class="row justify-content-center text-center">
+                <div class="col-xl-9">
+                    <div class="h1-slider-caption">
+                        <h1 data-animation="fadeInUp" data-delay=".4s">Le Nostre Camere & Suite</h1>
+                        <h3 data-animation="fadeInDown" data-delay=".4s">Scegli la sistemazione perfetta per le tue vacanze</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filter Bar -->
+<section class="booking-area pt-60 pb-30">
+    <div class="container">
+        <div class="card shadow-sm border-0 p-4 rounded bg-light">
+            <form action="<[base]>/rooms.php" method="GET" class="row align-items-end">
+                <div class="col-md-3 mb-3">
+                    <label class="font-weight-bold text-dark small">Parola Chiave / Tipo</label>
+                    <input type="text" name="filter" class="form-control" placeholder="es. Vista Mare, Suite..." value="<[val_filter]>">
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label class="font-weight-bold text-dark small">Ospiti Minimi</label>
+                    <select name="capacity" class="form-control">
+                        <option value="">Qualsiasi</option>
+                        <option value="1">1+ Ospite</option>
+                        <option value="2">2+ Ospiti</option>
+                        <option value="3">3+ Ospiti</option>
+                        <option value="4">4+ Ospiti</option>
+                        <option value="6">6+ Ospiti (Famiglia)</option>
+                    </select>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label class="font-weight-bold text-dark small">Prezzo Max / Notte (€)</label>
+                    <input type="number" name="max_price" class="form-control" placeholder="es. 300" value="<[val_max_price]>">
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label class="font-weight-bold text-dark small">Check In</label>
+                    <input type="text" name="check_in" class="form-control" placeholder="gg/mm/aaaa" value="<[val_check_in]>">
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label class="font-weight-bold text-dark small">Check Out</label>
+                    <input type="text" name="check_out" class="form-control" placeholder="gg/mm/aaaa" value="<[val_check_out]>">
+                </div>
+                <div class="col-md-1 mb-3">
+                    <button type="submit" class="btn btn1 w-100 py-2"><i class="fas fa-search"></i></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- Rooms Grid Start -->
+<section class="room-area pt-30 pb-90">
+    <div class="container">
+        <div class="row">
+            <[foreach]>
+            <div class="col-xl-6 col-lg-6 col-md-6">
+                <div class="single-room mb-50 shadow-sm border rounded overflow-hidden bg-white">
+                    <div class="room-img position-relative">
+                       <a href="<[base]>/room_details.php<[rooms_list.link_params]>"><img src="<[base]>/skins/customers/assets/img/rooms/<[rooms_list.image_url]>" alt="<[rooms_list.name]>" style="height: 350px; width: 100%; object-fit: cover;"></a>
+                    </div>
+                    <div class="room-caption p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h3 class="mb-0"><a href="<[base]>/room_details.php<[rooms_list.link_params]>" class="text-dark font-weight-bold"><[rooms_list.name]></a></h3>
+                            <span class="badge badge-info py-2 px-3"><i class="fas fa-users me-1"></i> Max <[rooms_list.capacity]> Ospiti</span>
+                        </div>
+                        <div class="per-night mb-3">
+                            <span class="text-primary font-weight-bold fs-4">€<[rooms_list.base_price]> <span class="text-muted fs-6 font-weight-normal">/ notte</span></span>
+                        </div>
+                        <p class="text-muted mb-4"><[rooms_list.description]></p>
+                        <div class="d-flex justify-content-between align-items-center border-top pt-3">
+                            <a href="<[base]>/room_details.php<[rooms_list.link_params]>" class="text-primary font-weight-bold">Esplora Dettagli & Servizi <i class="fas fa-arrow-right ml-1"></i></a>
+                            <a href="<[base]>/room_details.php<[rooms_list.link_params]>" class="btn btn-sm">Prenota Ora</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <[/foreach]>
+        </div>
+    </div>
+</section>

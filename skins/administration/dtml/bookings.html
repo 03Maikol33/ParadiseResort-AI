@@ -1,0 +1,82 @@
+<div class="page-heading mb-4 d-flex justify-content-between align-items-center">
+  <div class="page-heading-copy">
+    <span class="page-icon"><i class="bi bi-calendar-check-fill"></i></span>
+    <div>
+      <p class="eyebrow mb-1">Gestione Soggiorni & Ricevimento</p>
+      <h1 class="h3 mb-1">Prenotazioni Resort & Check-In</h1>
+      <p class="text-muted mb-0">Tabella operativa di tutti i soggiorni in attesa, confermati o conclusi. Aggiorna lo stato al check-in e check-out.</p>
+    </div>
+  </div>
+</div>
+
+<[if!empty message]>
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="bi bi-check-circle-fill me-2"></i> <[message]>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+<[/if!empty]>
+
+<[if!empty error]>
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i> <[error]>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+<[/if!empty]>
+
+<div class="card shadow-sm border-0 rounded">
+  <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+    <h6 class="mb-0 fw-bold"><i class="bi bi-list-task me-2 text-primary"></i>Elenco Soggiorni Registrati</h6>
+    <span class="badge bg-light text-dark border">Aggiornamento Real-time</span>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="bg-light">
+          <tr>
+            <th class="ps-4">ID</th>
+            <th>Ospite / Contatti</th>
+            <th>Sistemazione</th>
+            <th>Periodo Soggiorno</th>
+            <th>Totale</th>
+            <th>Stato Attuale</th>
+            <th>Fattura</th>
+            <th class="text-end pe-4" style="width: 220px;">Cambia Stato (Azione)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <[foreach]>
+          <tr>
+            <td class="ps-4 fw-bold">#<[booking_rows.id]></td>
+            <td>
+              <strong class="d-block text-dark"><[booking_rows.guest_name]></strong>
+              <small class="text-muted"><i class="bi bi-envelope me-1"></i><[booking_rows.guest_email]></small><br>
+              <small class="text-muted"><i class="bi bi-telephone me-1"></i><[booking_rows.guest_phone]></small>
+            </td>
+            <td>
+              <span class="fw-bold d-block"><[booking_rows.category_name]></span>
+              <span class="badge bg-light text-dark border">Cam. <[booking_rows.room_number]></span>
+            </td>
+            <td class="small fw-bold"><[booking_rows.dates]></td>
+            <td class="fw-bold text-success">€ <[booking_rows.total_price]></td>
+            <td><[booking_rows.status_badge]></td>
+            <td class="text-center"><[booking_rows.invoice_link]></td>
+            <td class="text-end pe-4">
+              <form action="<[base]>/<[role_path]>/bookings.php" method="POST" class="d-flex gap-1 justify-content-end">
+                <input type="hidden" name="action" value="change_status">
+                <input type="hidden" name="booking_id" value="<[booking_rows.id]>">
+                <select name="status_id" class="form-select form-select-sm" style="width: 140px;">
+                  <option value="2" <[booking_rows.sel_2]>>Pending (In Attesa)</option>
+                  <option value="3" <[booking_rows.sel_3]>>Confirmed (Confermata)</option>
+                  <option value="5" <[booking_rows.sel_5]>>Completed (Check-Out)</option>
+                  <option value="4" <[booking_rows.sel_4]>>Cancelled (Annullata)</option>
+                </select>
+                <button type="submit" class="btn btn-sm btn-primary" title="Salva Stato"><i class="bi bi-check2"></i></button>
+              </form>
+            </td>
+          </tr>
+          <[/foreach]>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

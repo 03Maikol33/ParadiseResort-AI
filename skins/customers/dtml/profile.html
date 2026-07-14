@@ -1,0 +1,134 @@
+<!-- Hero Title -->
+<div class="slider-area ">
+    <div class="single-slider hero-overly slider-height2 d-flex align-items-center" style="background-image: url('<[base]>/skins/customers/assets/img/hero/contact_hero.jpg'); background-size: cover; background-position: center;">
+        <div class="container">
+            <div class="row justify-content-center text-center">
+                <div class="col-xl-9">
+                    <div class="h1-slider-caption">
+                        <h1 data-animation="fadeInUp" data-delay=".4s">Area Personale</h1>
+                        <h3 data-animation="fadeInDown" data-delay=".4s">Gestisci il tuo profilo e le tue vacanze</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="profile-section pt-80 pb-90">
+    <div class="container">
+        <[if!empty message]>
+            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                <i class="fas fa-check-circle me-2"></i> <[message]>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        <[/if!empty]>
+
+        <[if!empty error]>
+            <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i> <[error]>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        <[/if!empty]>
+
+        <div class="row">
+            <!-- Left Column: Personal Data Update -->
+            <div class="col-lg-4 mb-5 mb-lg-0">
+                <div class="card shadow-sm border-0 rounded p-4 bg-light">
+                    <h5 class="font-weight-bold mb-3 border-bottom pb-2"><i class="fas fa-user-edit text-primary me-2"></i> I Miei Dati Profilo</h5>
+                    <form action="<[base]>/profile.php" method="POST">
+                        <input type="hidden" name="action" value="update_profile">
+                        
+                        <div class="form-group mb-3">
+                            <label class="font-weight-bold small text-dark">Nome *</label>
+                            <input type="text" name="first_name" class="form-control" value="<[user.first_name]>" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label class="font-weight-bold small text-dark">Cognome *</label>
+                            <input type="text" name="last_name" class="form-control" value="<[user.last_name]>" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label class="font-weight-bold small text-dark">Email (non modificabile)</label>
+                            <input type="email" class="form-control bg-white text-muted" value="<[user.email]>" readonly>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label class="font-weight-bold small text-dark">Telefono / Cellulare</label>
+                            <input type="text" name="phone" class="form-control" value="<[user.phone]>">
+                        </div>
+                        <div class="form-group mb-4">
+                            <label class="font-weight-bold small text-dark">Nuova Password (opzionale)</label>
+                            <input type="password" name="password" class="form-control" placeholder="Lascia vuota per non cambiare">
+                        </div>
+                        
+                        <button type="submit" class="btn btn1 w-100 py-2"><i class="fas fa-save me-2"></i> Aggiorna Profilo</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Right Column: Bookings History (US-15 & US-16) -->
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0 rounded overflow-hidden">
+                    <div class="card-header bg-dark text-white py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold"><i class="fas fa-history me-2"></i> Storico e Stato Soggiorni</h5>
+                        <a href="<[base]>/rooms.php" class="btn btn-sm btn-outline-light"><i class="fas fa-plus me-1"></i> Nuova Prenotazione</a>
+                    </div>
+                    <div class="card-body p-0">
+                        <[ifempty has_history]>
+                            <div class="text-center p-5">
+                                <i class="fas fa-calendar-times text-muted mb-3" style="font-size: 3rem;"></i>
+                                <h5 class="font-weight-bold">Nessun Soggiorno Registrato</h5>
+                                <p class="text-muted small">Non hai ancora effettuato prenotazioni presso il nostro resort.</p>
+                                <a href="<[base]>/rooms.php" class="btn btn1 btn-sm mt-2">Scopri le Camere</a>
+                            </div>
+                        <[/ifempty]>
+
+                        <[if!empty has_history]>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th class="ps-4">Sistemazione</th>
+                                            <th>Stanza</th>
+                                            <th>Periodo Soggiorno</th>
+                                            <th>Prezzo Tot.</th>
+                                            <th>Stato</th>
+                                            <th class="text-end pe-4">Documenti & Azioni</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <[foreach]>
+                                        <tr>
+                                            <td class="ps-4">
+                                                <div class="d-flex align-items-center">
+                                                    <img src="<[base]>/skins/customers/assets/img/rooms/<[booking_list.image_url]>" class="rounded me-3 shadow-sm" style="width: 55px; height: 45px; object-fit: cover;" alt="">
+                                                    <div>
+                                                        <strong class="d-block text-dark"><[booking_list.category_name]></strong>
+                                                        <small class="text-muted">ID #<[booking_list.id]></small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td><span class="badge badge-secondary py-1 px-2">Cam. <[booking_list.room_number]></span></td>
+                                            <td class="small font-weight-bold"><[booking_list.dates]></td>
+                                            <td class="font-weight-bold text-primary">€ <[booking_list.price]></td>
+                                            <td><[booking_list.status_badge]></td>
+                                            <td class="text-end pe-4">
+                                                <div class="d-flex justify-content-end align-items-center">
+                                                    <[booking_list.invoice_btn]>
+                                                    <[booking_list.cancel_btn]>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <[/foreach]>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <[/if!empty]>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,64 @@
+<div class="page-heading mb-4 d-flex justify-content-between align-items-center">
+  <div class="page-heading-copy">
+    <span class="page-icon"><i class="bi bi-people-fill"></i></span>
+    <div>
+      <p class="eyebrow mb-1">Ricerca Clienti & Check-In</p>
+      <h1 class="h3 mb-1">Anagrafica Ospiti & Soggiorni Attivi</h1>
+      <p class="text-muted mb-0">Ricerca rapida dei clienti registrati al portale con indicatore immediato delle prenotazioni in corso di validità.</p>
+    </div>
+  </div>
+  <div>
+    <a href="<[base]>/receptionist/bookings.php" class="btn btn-outline-primary"><i class="bi bi-list-check me-1"></i> Gestione Prenotazioni</a>
+  </div>
+</div>
+
+<!-- Search Bar -->
+<div class="card shadow-sm border-0 rounded mb-4 p-3 bg-white">
+  <form action="<[base]>/receptionist/users.php" method="GET" class="row g-2 align-items-center">
+    <div class="col-md-9">
+      <div class="input-group">
+        <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+        <input type="text" name="search" class="form-control border-start-0" placeholder="Cerca per Nome, Cognome, Email o Telefono..." value="<[val_search]>">
+      </div>
+    </div>
+    <div class="col-md-3 d-flex gap-2">
+      <button type="submit" class="btn btn-primary fw-bold flex-grow-1"><i class="bi bi-search me-1"></i> Cerca</button>
+      <a href="<[base]>/receptionist/users.php" class="btn btn-outline-secondary" title="Reset"><i class="bi bi-arrow-counterclockwise"></i></a>
+    </div>
+  </form>
+</div>
+
+<!-- Table -->
+<div class="card shadow-sm border-0 rounded">
+  <div class="card-header bg-white py-3">
+    <h6 class="mb-0 fw-bold"><i class="bi bi-person-badge me-2 text-primary"></i>Risultati Ricerca Anagrafica</h6>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="bg-light">
+          <tr>
+            <th class="ps-4">ID</th>
+            <th>Cognome & Nome</th>
+            <th>Contatto Email</th>
+            <th>Telefono</th>
+            <th class="text-center">Soggiorni Attivi (In Corso / Confermati)</th>
+            <th class="text-end pe-4">Totale Storico</th>
+          </tr>
+        </thead>
+        <tbody>
+          <[foreach]>
+          <tr>
+            <td class="ps-4 fw-bold text-muted">#<[user_rows.id]></td>
+            <td class="fw-bold text-dark fs-6"><[user_rows.last_name]> <[user_rows.first_name]></td>
+            <td><a href="mailto:<[user_rows.email]>" class="text-decoration-none"><[user_rows.email]></a></td>
+            <td><i class="bi bi-telephone text-muted me-1"></i> <[user_rows.phone]></td>
+            <td class="text-center"><[user_rows.active_badge]></td>
+            <td class="text-end pe-4"><span class="badge bg-light text-dark border fs-6"><[user_rows.total_count]> soggiorni</span></td>
+          </tr>
+          <[/foreach]>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

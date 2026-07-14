@@ -1,0 +1,128 @@
+<!-- Hero Title -->
+<div class="slider-area ">
+    <div class="single-slider hero-overly slider-height2 d-flex align-items-center" style="background-image: url('<[base]>/skins/customers/assets/img/hero/contact_hero.jpg'); background-size: cover; background-position: center;">
+        <div class="container">
+            <div class="row justify-content-center text-center">
+                <div class="col-xl-9">
+                    <div class="h1-slider-caption">
+                        <h1 data-animation="fadeInUp" data-delay=".4s">Assistenza & Manutenzione</h1>
+                        <h3 data-animation="fadeInDown" data-delay=".4s">Richiedi un intervento tecnico tempestivo direttamente in camera</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="report-ticket-area pt-80 pb-90">
+    <div class="container">
+        <[if!empty message]>
+            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                <i class="fas fa-check-circle me-2"></i> <[message]>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        <[/if!empty]>
+
+        <[if!empty error]>
+            <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i> <[error]>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        <[/if!empty]>
+
+        <div class="row">
+            <!-- Left Column: Report Form -->
+            <div class="col-lg-5 mb-5 mb-lg-0">
+                <div class="card shadow-lg border-0 rounded p-4" style="background: #fff; border-top: 4px solid #d4af37 !important;">
+                    <h4 class="font-weight-bold mb-3 border-bottom pb-2"><i class="fas fa-tools text-primary me-2"></i> Apri una Segnalazione Guasto</h4>
+                    <p class="text-muted small mb-4">Il nostro team di manutenzione tecnica è operativo 24 ore su 24 per risolvere rapidamente guasti a condizionatori, idraulica o Wi-Fi.</p>
+
+                    <[ifempty has_rooms]>
+                        <div class="alert alert-warning">
+                            Non risulta alcuna camera attiva o passata collegata a questo profilo. Non puoi inviare segnalazioni.
+                        </div>
+                    <[/ifempty]>
+
+                    <[if!empty has_rooms]>
+                        <form action="<[base]>/send-report-ticket.php" method="POST">
+                            <input type="hidden" name="action" value="save_ticket">
+
+                            <div class="form-group mb-3">
+                                <label class="font-weight-bold small text-dark"><i class="fas fa-door-open text-primary me-1"></i> Camera Coinvolta *</label>
+                                <select name="room_id" class="form-control py-2" required>
+                                    <[room_options]>
+                                </select>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="font-weight-bold small text-dark"><i class="fas fa-exclamation-triangle text-warning me-1"></i> Priorità di Intervento *</label>
+                                <select name="priority" class="form-control py-2" required>
+                                    <option value="Low">Low - Lieve (Es. lampadina bruciata)</option>
+                                    <option value="Medium" selected>Medium - Normale (Es. regolazione TV o cassaforte)</option>
+                                    <option value="High">High - Urgente (Es. perdita acqua, climatizzatore spento)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <label class="font-weight-bold small text-dark"><i class="fas fa-comment-alt text-primary me-1"></i> Descrizione Dettagliata del Guasto *</label>
+                                <textarea name="issue_description" class="form-control" rows="5" placeholder="Descrivi con chiarezza il problema in modo che il tecnico porti gli strumenti adatti..." required></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn1 w-100 py-3 font-weight-bold" style="font-size: 1.1rem;"><i class="fas fa-paper-plane me-2"></i> Invia al Reparto Tecnico</button>
+                        </form>
+                    <[/if!empty]>
+                </div>
+            </div>
+
+            <!-- Right Column: Active Tickets History -->
+            <div class="col-lg-7">
+                <div class="card shadow-sm border-0 rounded overflow-hidden">
+                    <div class="card-header bg-dark text-white py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold"><i class="fas fa-history me-2"></i> Le Mie Segnalazioni In Corso</h5>
+                        <span class="badge badge-info text-dark">Supporto 24/7</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <[ifempty has_tickets]>
+                            <div class="text-center p-5">
+                                <i class="fas fa-check-double text-success mb-3" style="font-size: 3rem;"></i>
+                                <h5 class="font-weight-bold">Tutto Funziona alla Perfettione!</h5>
+                                <p class="text-muted small">Non hai alcuna segnalazione tecnica aperta per le tue sistemazioni.</p>
+                            </div>
+                        <[/ifempty]>
+
+                        <[if!empty has_tickets]>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th class="ps-4">Stanza</th>
+                                            <th>Problema Segnalato</th>
+                                            <th>Priorità</th>
+                                            <th>Data Invio</th>
+                                            <th>Stato</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <[foreach]>
+                                        <tr>
+                                            <td class="ps-4 font-weight-bold text-primary"><i class="fas fa-key me-1"></i> Cam. <[ticket_list.room_number]></td>
+                                            <td class="text-dark small"><[ticket_list.issue]></td>
+                                            <td><[ticket_list.priority_badge]></td>
+                                            <td class="small text-muted"><[ticket_list.date]></td>
+                                            <td><span class="badge badge-warning text-dark px-3 py-2"><i class="fas fa-wrench me-1"></i> In Corso</span></td>
+                                        </tr>
+                                        <[/foreach]>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <[/if!empty]>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

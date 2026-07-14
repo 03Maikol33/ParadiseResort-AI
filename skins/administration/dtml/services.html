@@ -1,0 +1,105 @@
+<div class="page-heading mb-4 d-flex justify-content-between align-items-center">
+  <div class="page-heading-copy">
+    <span class="page-icon"><i class="bi bi-shield-lock-fill"></i></span>
+    <div>
+      <p class="eyebrow mb-1">Controllo Accessi & Sicurezza</p>
+      <h1 class="h3 mb-1">Matrice dei Permessi (RBAC)</h1>
+      <p class="text-muted mb-0">Associa ogni script PHP del sistema ai gruppi organizzativi (Amministratore, Receptionist, Guest).</p>
+    </div>
+  </div>
+</div>
+
+<[if!empty message]>
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="bi bi-check-circle-fill me-2"></i> <[message]>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+<[/if!empty]>
+
+<[if!empty error]>
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i> <[error]>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+<[/if!empty]>
+
+<div class="row g-4">
+  <div class="col-lg-3">
+    <div class="card shadow-sm border-0 rounded mb-4">
+      <div class="card-header bg-dark text-white py-3">
+        <h6 class="mb-0 fw-bold"><i class="bi bi-plus-circle me-2"></i> Registra Script</h6>
+      </div>
+      <div class="card-body p-4">
+        <form action="<[base]>/admin/services.php" method="POST">
+          <input type="hidden" name="action" value="add_service">
+          <div class="mb-3">
+            <label class="form-label fw-bold small">Nome Script *</label>
+            <input type="text" name="script_name" class="form-control" placeholder="es. report.php" required>
+            <div class="form-text small">Nome del file esatto verificato da require_service()</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold small">Descrizione Funzione</label>
+            <input type="text" name="description" class="form-control" placeholder="es. Reportistica Finanziaria">
+          </div>
+          <button type="submit" class="btn btn-dark w-100 fw-bold"><i class="bi bi-save me-1"></i> Aggiungi</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-9">
+    <form action="<[base]>/admin/services.php" method="POST">
+      <input type="hidden" name="action" value="save_matrix">
+      
+      <div class="card shadow-sm border-0 rounded">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+          <h6 class="mb-0 fw-bold"><i class="bi bi-grid-3x3-gap-fill me-2 text-primary"></i>Configurazione Permessi per Gruppo</h6>
+          <button type="submit" class="btn btn-success fw-bold"><i class="bi bi-check2-square me-1"></i> Salva Matrice RBAC</button>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle text-center mb-0">
+              <thead class="bg-light">
+                <tr>
+                  <th class="text-start ps-4">ID</th>
+                  <th class="text-start">Nome Script PHP</th>
+                  <th class="text-start">Descrizione</th>
+                  <th class="bg-danger bg-opacity-10 text-danger fw-bold" style="width: 130px;">Amministratore<br><small class="text-muted">(Grp 1)</small></th>
+                  <th class="bg-primary bg-opacity-10 text-primary fw-bold" style="width: 130px;">Receptionist<br><small class="text-muted">(Grp 2)</small></th>
+                  <th class="bg-info bg-opacity-10 text-dark fw-bold" style="width: 130px;">Ospite Guest<br><small class="text-muted">(Grp 3)</small></th>
+                </tr>
+              </thead>
+              <tbody>
+                <[foreach]>
+                <tr>
+                  <td class="text-start ps-4 fw-bold">#<[service_rows.id]></td>
+                  <td class="text-start font-monospace text-primary fw-bold"><[service_rows.script_name]></td>
+                  <td class="text-start text-muted"><[service_rows.description]></td>
+                  
+                  <!-- Amministratore (Group 1) -->
+                  <td class="bg-light">
+                    <input class="form-check-input" type="checkbox" name="perm[1][<[service_rows.id]>]" value="1" <[service_rows.check_admin]> style="width: 20px; height: 20px; cursor: pointer;">
+                  </td>
+                  
+                  <!-- Receptionist (Group 2) -->
+                  <td>
+                    <input class="form-check-input" type="checkbox" name="perm[2][<[service_rows.id]>]" value="1" <[service_rows.check_receptionist]> style="width: 20px; height: 20px; cursor: pointer;">
+                  </td>
+                  
+                  <!-- Guest (Group 3) -->
+                  <td class="bg-light">
+                    <input class="form-check-input" type="checkbox" name="perm[3][<[service_rows.id]>]" value="1" <[service_rows.check_guest]> style="width: 20px; height: 20px; cursor: pointer;">
+                  </td>
+                </tr>
+                <[/foreach]>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card-footer bg-light p-3 text-end">
+          <button type="submit" class="btn btn-success px-4 fw-bold"><i class="bi bi-check2-square me-1"></i> Salva Matrice RBAC</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

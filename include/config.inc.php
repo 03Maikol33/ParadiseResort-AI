@@ -12,6 +12,17 @@ define('NONE',   0);
 define('FILE',   1);
 define('MEMORY', 2);
 
+$docRoot = str_replace('\\', '/', realpath($_SERVER['DOCUMENT_ROOT'] ?? ''));
+$projRoot = str_replace('\\', '/', realpath(__DIR__ . '/..'));
+$basePath = '';
+if (!empty($docRoot) && strpos(strtolower($projRoot), strtolower($docRoot)) === 0) {
+    $basePath = substr($projRoot, strlen($docRoot));
+}
+if ($basePath === false || $basePath === null) {
+    $basePath = '/progettoAi';
+}
+$basePath = rtrim($basePath, '/');
+
 $config = [
 
     'db' => [
@@ -25,7 +36,7 @@ $config = [
 
     'skin'         => 'customers',
     'admin_skin'   => 'administration',
-    'base'         => '/progetto/zParadiseResort',
+    'base'         => $basePath,
     'upload_dir'   => 'uploads',
 
     'cache_folder'  => 'cache',
@@ -36,3 +47,4 @@ $config = [
     'currentlanguage'  => 'it',
     'currenttab'       => '',
 ];
+

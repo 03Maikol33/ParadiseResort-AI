@@ -1,0 +1,108 @@
+<div class="page-heading mb-4 d-flex justify-content-between align-items-center">
+  <div class="page-heading-copy">
+    <span class="page-icon"><i class="bi bi-building"></i></span>
+    <div>
+      <p class="eyebrow mb-1">Inventario Strutturale</p>
+      <h1 class="h3 mb-1">Anagrafica Camere Fisiche</h1>
+      <p class="text-muted mb-0">Monitora e gestisci tutte le singole stanze del resort, abbinandole alle categorie e assegnando il piano edilizio.</p>
+    </div>
+  </div>
+  <div>
+    <a href="<[base]>/admin/categories.php" class="btn btn-outline-primary"><i class="bi bi-tags-fill me-1"></i> Torna alle Categorie</a>
+  </div>
+</div>
+
+<[if!empty message]>
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="bi bi-check-circle-fill me-2"></i> <[message]>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+<[/if!empty]>
+
+<[if!empty error]>
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i> <[error]>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+<[/if!empty]>
+
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card shadow-sm border-0 rounded">
+      <div class="card-header bg-dark text-white py-3">
+        <h6 class="mb-0 fw-bold"><i class="bi bi-door-open me-2"></i> Registra Nuova Camera</h6>
+      </div>
+      <div class="card-body p-4">
+        <form action="<[base]>/admin/rooms.php" method="POST">
+          <input type="hidden" name="action" value="save_room">
+          
+          <div class="mb-3">
+            <label class="form-label fw-bold small">Numero o Sigla Stanza *</label>
+            <input type="text" name="room_number" class="form-control" placeholder="es. 101 o Suite Imperiale" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold small">Categoria Commerciale *</label>
+            <select name="room_category_id" class="form-select" required>
+              <[category_options]>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold small">Piano *</label>
+            <input type="number" name="floor" class="form-control" value="1" required>
+          </div>
+          <div class="mb-4">
+            <label class="form-label fw-bold small">Stato Operativo Attuale *</label>
+            <select name="status" class="form-select" required>
+              <option value="Available">Available (Disponibile / Pulita)</option>
+              <option value="Occupied">Occupied (Occupata dai Clienti)</option>
+              <option value="Dirty">Dirty (Da Pulire)</option>
+              <option value="Maintenance">Maintenance (In Manutenzione / Guasto)</option>
+            </select>
+          </div>
+          
+          <button type="submit" class="btn btn-dark w-100 fw-bold py-2"><i class="bi bi-save me-2"></i> Registra Stanza</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="card shadow-sm border-0 rounded">
+      <div class="card-header bg-white py-3">
+        <h6 class="mb-0 fw-bold"><i class="bi bi-grid-fill me-2 text-primary"></i>Inventario Fisico Camere</h6>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light">
+              <tr>
+                <th class="ps-4">ID</th>
+                <th>Numero / Sigla</th>
+                <th>Piano</th>
+                <th>Categoria</th>
+                <th>Stato Operativo</th>
+                <th class="text-end pe-4">Azione</th>
+              </tr>
+            </thead>
+            <tbody>
+              <[foreach]>
+              <tr>
+                <td class="ps-4 fw-bold">#<[room_list.id]></td>
+                <td class="fw-bold fs-6 text-primary"><i class="bi bi-key me-1"></i> Cam. <[room_list.room_number]></td>
+                <td>Piano <[room_list.floor]></td>
+                <td class="fw-bold text-dark"><[room_list.category_name]></td>
+                <td><[room_list.status_badge]></td>
+                <td class="text-end pe-4">
+                  <a href="<[base]>/admin/rooms.php?del_id=<[room_list.id]>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Sicuro di voler eliminare questa camera fisica (#<[room_list.id]>)?');" title="Elimina Camera">
+                    <i class="bi bi-trash"></i>
+                  </a>
+                </td>
+              </tr>
+              <[/foreach]>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

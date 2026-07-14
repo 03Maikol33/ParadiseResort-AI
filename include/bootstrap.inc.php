@@ -18,6 +18,38 @@ require_once __DIR__ . '/db.inc.php';
 require_once __DIR__ . '/page.inc.php';
 require_once __DIR__ . '/auth.inc.php';
 
+// US-03: Auto-login se la sessione è scaduta ma esiste il cookie "Ricordami"
+if (empty($_SESSION['user']['id']) && !empty($_COOKIE['paradise_remember'])) {
+    $parts = explode(':', $_COOKIE['paradise_remember']);
+    if (count($parts) === 2) {
+        $userId = (int)$parts[0];
+        $tokenHash = $parts[1];
+        try {
+            $stmtUser = db()->prepare('SELECT * FROM users WHERE id = ?');
+            $stmtUser->execute([$userId]);
+            $u = $stmtUser->fetch();
+            if ($u) {
+                $expectedHash = hash_hmac('sha256', $u['id'] . '-' . $u['password'], 'ParadiseResortSecretKey2026');
+                if (hash_equals($expectedHash, $tokenHash)) {
+                    $_SESSION['user'] = [
+                        'id' => (int)$u['id'],
+                        'first_name' => $u['first_name'],
+                        'last_name' => $u['last_name'],
+                        'name' => trim($u['first_name'] . ' ' . $u['last_name']),
+                        'email' => $u['email'],
+                        'phone' => $u['phone'] ?? '',
+                        'image_url' => $u['image_url'] ?? '',
+                        'services' => load_user_services((int)$u['id'])
+                    ];
+                }
+            }
+        } catch (Exception $e) {
+            // Ignora errori durante il controllo del cookie
+        }
+    }
+}
+
+
 function get_cart_count(): int {
     if (empty($_SESSION['user']['id'])) {
         return 0;

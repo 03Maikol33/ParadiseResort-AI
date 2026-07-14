@@ -1,0 +1,111 @@
+<div class="page-heading mb-4 d-flex justify-content-between align-items-center">
+  <div class="page-heading-copy">
+    <span class="page-icon"><i class="bi bi-tags-fill"></i></span>
+    <div>
+      <p class="eyebrow mb-1">Listino & Tipologie</p>
+      <h1 class="h3 mb-1">Categorie Camere & Suite</h1>
+      <p class="text-muted mb-0">Gestisci i prezzi base, le descrizioni commerciali e la capacità di ospiti per ogni tipologia.</p>
+    </div>
+  </div>
+  <div>
+    <a href="<[base]>/admin/rooms.php" class="btn btn-outline-primary"><i class="bi bi-building me-1"></i> Gestione Inventario Camere Fisiche</a>
+  </div>
+</div>
+
+<[if!empty message]>
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="bi bi-check-circle-fill me-2"></i> <[message]>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+<[/if!empty]>
+
+<[if!empty error]>
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i> <[error]>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+<[/if!empty]>
+
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card shadow-sm border-0 rounded">
+      <div class="card-header bg-dark text-white py-3">
+        <h6 class="mb-0 fw-bold"><i class="bi bi-plus-circle me-2"></i> Nuova Categoria</h6>
+      </div>
+      <div class="card-body p-4">
+        <form action="<[base]>/admin/categories.php" method="POST">
+          <input type="hidden" name="action" value="save_category">
+          
+          <div class="mb-3">
+            <label class="form-label fw-bold small">Nome Categoria *</label>
+            <input type="text" name="name" class="form-control" placeholder="es. Deluxe Singola" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold small">Descrizione Commerciale</label>
+            <textarea name="description" class="form-control" rows="4" placeholder="Comfort esclusivo con vista giardino..."></textarea>
+          </div>
+          <div class="row">
+            <div class="col-6 mb-3">
+              <label class="form-label fw-bold small">Prezzo Base (€) *</label>
+              <input type="number" step="0.01" name="base_price" class="form-control" placeholder="150.00" required>
+            </div>
+            <div class="col-6 mb-3">
+              <label class="form-label fw-bold small">Capienza (Ospiti) *</label>
+              <input type="number" name="capacity" class="form-control" placeholder="2" required>
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="form-label fw-bold small">File Immagine</label>
+            <input type="text" name="image_url" class="form-control" value="deluxe_singola.jpg">
+          </div>
+          
+          <button type="submit" class="btn btn-dark w-100 fw-bold py-2"><i class="bi bi-save me-2"></i> Salva Categoria</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="card shadow-sm border-0 rounded">
+      <div class="card-header bg-white py-3">
+        <h6 class="mb-0 fw-bold"><i class="bi bi-list-stars me-2 text-primary"></i>Catalogo Attivo nel Resort</h6>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light">
+              <tr>
+                <th class="ps-4">ID</th>
+                <th>Foto</th>
+                <th>Nome</th>
+                <th>Capienza</th>
+                <th>Prezzo Base</th>
+                <th>Descrizione</th>
+                <th class="text-end pe-4">Azione</th>
+              </tr>
+            </thead>
+            <tbody>
+              <[foreach]>
+              <tr>
+                <td class="ps-4 fw-bold">#<[cat_list.id]></td>
+                <td>
+                  <img src="<[base]>/skins/customers/assets/img/rooms/<[cat_list.image_url]>" class="rounded border shadow-sm" style="width: 55px; height: 45px; object-fit: cover;" alt="<[cat_list.name]>">
+                </td>
+                <td class="fw-bold text-dark"><[cat_list.name]></td>
+                <td><span class="badge bg-secondary"><i class="bi bi-person-fill"></i> <[cat_list.capacity]> max</span></td>
+                <td class="fw-bold text-success">€ <[cat_list.base_price]></td>
+                <td class="small text-muted" style="max-width: 220px;"><[cat_list.description]></td>
+                <td class="text-end pe-4">
+                  <a href="<[base]>/admin/categories.php?del_id=<[cat_list.id]>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Sicuro di voler eliminare questa categoria?');" title="Elimina Categoria">
+                    <i class="bi bi-trash"></i>
+                  </a>
+                </td>
+              </tr>
+              <[/foreach]>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -27,7 +27,29 @@ function new_page(string $skinName, string $frame = 'frame-public'): Template {
     $GLOBALS['config']['skin']   = $skinName;
 
     $root = __DIR__ . '/..';
-    return new Template("{$root}/skins/{$skinName}/dtml/{$frame}");
+    $page = new Template("{$root}/skins/{$skinName}/dtml/{$frame}");
+    $page->setContent('base', $GLOBALS['config']['base']);
+    if (function_exists('get_cart_count')) {
+        $cartCount = get_cart_count();
+        $page->setContent('cart_count', (string)$cartCount);
+        $page->setContent('cart_badge', $cartCount > 0 ? "<span class=\"badge badge-danger cart-badge\">$cartCount</span>" : "");
+    }
+    if (!empty($_SESSION['user']['id'])) {
+        $page->setContent('is_logged', '1');
+        $uName = $_SESSION['user']['name'] ?? trim(($_SESSION['user']['first_name'] ?? '') . ' ' . ($_SESSION['user']['last_name'] ?? ''));
+        $page->setContent('user_name', htmlspecialchars($uName));
+        if (function_exists('is_admin') && is_admin()) {
+            $page->setContent('user_role_link', '<a href="' . $GLOBALS['config']['base'] . '/admin/index.php" class="dropdown-item"><i class="fas fa-tools me-2"></i> Dashboard Admin</a>');
+        } elseif (function_exists('is_receptionist') && is_receptionist()) {
+            $page->setContent('user_role_link', '<a href="' . $GLOBALS['config']['base'] . '/receptionist/index.php" class="dropdown-item"><i class="fas fa-concierge-bell me-2"></i> Dashboard Reception</a>');
+        } else {
+            $page->setContent('user_role_link', '');
+        }
+    } else {
+        $page->setContent('is_logged', '');
+        $page->setContent('user_role_link', '');
+    }
+    return $page;
 }
 
 /**
@@ -38,7 +60,16 @@ function new_block(string $template): Template {
 
     $skinName = $GLOBALS['current_skin'] ?? $GLOBALS['config']['skin'];
     $root = __DIR__ . '/..';
-    return new Template("{$root}/skins/{$skinName}/dtml/{$template}");
+    $block = new Template("{$root}/skins/{$skinName}/dtml/{$template}");
+    $block->setContent('base', $GLOBALS['config']['base']);
+    if (!empty($_SESSION['user']['id'])) {
+        $block->setContent('is_logged', '1');
+        $uName = $_SESSION['user']['name'] ?? trim(($_SESSION['user']['first_name'] ?? '') . ' ' . ($_SESSION['user']['last_name'] ?? ''));
+        $block->setContent('user_name', htmlspecialchars($uName));
+    } else {
+        $block->setContent('is_logged', '');
+    }
+    return $block;
 }
 
 function setup_backoffice_page(Template $page, string $roleName, string $rolePath): void {

@@ -1,0 +1,56 @@
+<div class="page-heading mb-4 d-flex justify-content-between align-items-center">
+  <div class="page-heading-copy">
+    <span class="page-icon"><i class="bi bi-concierge-bell-fill"></i></span>
+    <div>
+      <p class="eyebrow mb-1">Operatività Reception & Room Service</p>
+      <h1 class="h3 mb-1">Servizi Extra Richiesti dagli Ospiti</h1>
+      <p class="text-muted mb-0">Riepilogo cronologico degli extra (es. Champagne, Navetta, Terme) aggiunti dagli ospiti alle prenotazioni.</p>
+    </div>
+  </div>
+  <div>
+    <a href="<[base]>/<[role_path]>/bookings.php" class="btn btn-outline-primary"><i class="bi bi-calendar-check me-1"></i> Tabella Prenotazioni</a>
+  </div>
+</div>
+
+<div class="card shadow-sm border-0 rounded">
+  <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+    <h6 class="mb-0 fw-bold"><i class="bi bi-list-check me-2 text-primary"></i>Cronologia Servizi Richiesti (Ordinati per Check-In)</h6>
+    <span class="badge bg-primary px-3 py-2">Pronti per l'Allestimento</span>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="bg-light">
+          <tr>
+            <th class="ps-4">ID</th>
+            <th>Servizio Richiesto</th>
+            <th>Data Check-In</th>
+            <th>Ospite / Telefono</th>
+            <th>Sistemazione</th>
+            <th class="text-end pe-4">Prezzo Addebitato</th>
+          </tr>
+        </thead>
+        <tbody>
+          <[foreach]>
+          <tr>
+            <td class="ps-4 fw-bold text-muted">#<[req_rows.id]></td>
+            <td>
+              <strong class="d-block text-primary fs-6"><i class="bi bi-star-fill me-1"></i> <[req_rows.amenity_name]></strong>
+            </td>
+            <td><span class="badge bg-dark px-3 py-2 fs-6"><i class="bi bi-calendar-event me-1"></i> <[req_rows.check_in]></span></td>
+            <td>
+              <strong class="d-block text-dark"><[req_rows.guest_name]></strong>
+              <small class="text-muted"><i class="bi bi-telephone me-1"></i> <[req_rows.guest_phone]></small>
+            </td>
+            <td>
+              <strong class="d-block text-dark"><[req_rows.category_name]></strong>
+              <span class="badge bg-secondary">Cam. <[req_rows.room_number]> (Prenot. #<[req_rows.booking_id]>)</span>
+            </td>
+            <td class="text-end pe-4 fw-bold text-success fs-6">€ <[req_rows.price]></td>
+          </tr>
+          <[/foreach]>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

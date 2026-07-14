@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard <[user_role]> | ParadiseResort</title>
+
+  <link rel="stylesheet" href="<[base]>/skins/administration/assets/css/bootstrap.min.css">
+  <link rel="stylesheet" href="<[base]>/skins/administration/assets/vendors/bootstrap-icons/bootstrap-icons.css">
+  <link rel="stylesheet" href="<[base]>/skins/administration/assets/css/style.css">
+  <style>
+    .brand-mark .brand-title {
+      font-weight: 700;
+      color: #0d6efd;
+    }
+    .sidebar-user {
+      padding: 1rem;
+      border-top: 1px solid #e9ecef;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .avatar-initials {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #0d6efd;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+    .badge-status-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #198754;
+      border-radius: 50%;
+      display: inline-block;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="admin-shell">
+    <div class="sidebar-backdrop" data-sidebar-close></div>
+
+    <aside class="admin-sidebar" id="adminSidebar" aria-label="Main navigation">
+      <div class="sidebar-header">
+        <a class="brand-mark" href="<[base]>/<[role_path]>/index.php">
+          <span class="brand-icon"><i class="bi bi-building text-primary"></i></span>
+          <span class="brand-copy">
+            <span class="brand-title">ParadiseResort</span>
+            <span class="brand-subtitle"><[user_role]> Area</span>
+          </span>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a class="nav-link" href="<[base]>/<[role_path]>/index.php">
+          <span class="nav-icon"><i class="bi bi-speedometer2"></i></span>
+          <span class="nav-text">Dashboard</span>
+        </a>
+
+        <!-- VISTE CONDIVISE TRA ADMIN E RECEPTIONIST -->
+        <a class="nav-link" href="<[base]>/<[role_path]>/bookings.php">
+          <span class="nav-icon"><i class="bi bi-calendar-check"></i></span>
+          <span class="nav-text">Prenotazioni Resort</span>
+        </a>
+        <a class="nav-link" href="<[base]>/<[role_path]>/restaurant_bookings.php">
+          <span class="nav-icon"><i class="bi bi-cup-hot"></i></span>
+          <span class="nav-text">Prenotazioni Ristorante</span>
+        </a>
+        <a class="nav-link" href="<[base]>/<[role_path]>/requested_services.php">
+          <span class="nav-icon"><i class="bi bi-concierge-bell"></i></span>
+          <span class="nav-text">Servizi Richiesti</span>
+        </a>
+        <a class="nav-link" href="<[base]>/<[role_path]>/segnalazioni.php">
+          <span class="nav-icon"><i class="bi bi-tools"></i></span>
+          <span class="nav-text">Segnalazioni Guasti</span>
+        </a>
+
+        <[ifempty is_admin_role]>
+          <!-- VISTE ESCLUSIVE RECEPTIONIST (US-29, US-30) -->
+          <div class="px-3 py-2 text-uppercase text-muted" style="font-size: 0.7rem; font-weight: bold; margin-top: 10px;">Gestione Reception</div>
+          <a class="nav-link" href="<[base]>/receptionist/users.php">
+            <span class="nav-icon"><i class="bi bi-people"></i></span>
+            <span class="nav-text">Ricerca Clienti (US-29)</span>
+          </a>
+          <a class="nav-link" href="<[base]>/receptionist/rooms.php">
+            <span class="nav-icon"><i class="bi bi-door-open"></i></span>
+            <span class="nav-text">Stato Stanze (US-30)</span>
+          </a>
+        <[/ifempty]>
+
+        <[if!empty is_admin_role]>
+          <!-- VISTE ESCLUSIVE AMMINISTRATORE -->
+          <div class="px-3 py-2 text-uppercase text-muted" style="font-size: 0.7rem; font-weight: bold; margin-top: 10px;">Amministrazione DB</div>
+          <a class="nav-link" href="<[base]>/admin/users.php">
+            <span class="nav-icon"><i class="bi bi-people-fill"></i></span>
+            <span class="nav-text">Utenti Registrati</span>
+          </a>
+          <a class="nav-link" href="<[base]>/admin/staff.php">
+            <span class="nav-icon"><i class="bi bi-person-badge-fill"></i></span>
+            <span class="nav-text">Membri Staff</span>
+          </a>
+          <a class="nav-link" href="<[base]>/admin/services.php">
+            <span class="nav-icon"><i class="bi bi-shield-lock-fill"></i></span>
+            <span class="nav-text">Permessi & Gruppi</span>
+          </a>
+          <a class="nav-link" href="<[base]>/admin/categories.php">
+            <span class="nav-icon"><i class="bi bi-tags-fill"></i></span>
+            <span class="nav-text">Categorie Camere</span>
+          </a>
+          <a class="nav-link" href="<[base]>/admin/rooms.php">
+            <span class="nav-icon"><i class="bi bi-building"></i></span>
+            <span class="nav-text">Inventario Camere</span>
+          </a>
+          <a class="nav-link" href="<[base]>/admin/amenities.php">
+            <span class="nav-icon"><i class="bi bi-stars"></i></span>
+            <span class="nav-text">Servizi Extra</span>
+          </a>
+          <a class="nav-link" href="<[base]>/admin/reviews.php">
+            <span class="nav-icon"><i class="bi bi-star-fill"></i></span>
+            <span class="nav-text">Recensioni Clienti</span>
+          </a>
+        <[/if!empty]>
+
+        <div class="px-3 py-2 text-uppercase text-muted" style="font-size: 0.7rem; font-weight: bold; margin-top: 10px;">Sistema</div>
+        <a class="nav-link" href="<[base]>/index.php">
+          <span class="nav-icon"><i class="bi bi-house"></i></span>
+          <span class="nav-text">Torna al Sito Web</span>
+        </a>
+        <a class="nav-link text-danger" href="<[base]>/logout.php">
+          <span class="nav-icon"><i class="bi bi-box-arrow-right"></i></span>
+          <span class="nav-text">Logout</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-user">
+        <div class="avatar-initials"><[user_initials]></div>
+        <div>
+          <strong class="d-block text-truncate" style="max-width: 130px;"><[user_name]></strong>
+          <small class="text-muted"><[user_role]></small>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <span class="badge-status-dot me-1"></span>
+        <span class="sidebar-footer-text">Sistema Online</span>
+      </div>
+    </aside>
+
+    <div class="admin-main">
+      <nav class="navbar admin-navbar navbar-expand bg-white">
+        <div class="container-fluid px-3 px-lg-4">
+          <button class="sidebar-toggle" type="button" data-sidebar-toggle aria-controls="adminSidebar" aria-expanded="true" aria-label="Toggle sidebar">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+
+          <div class="d-none d-md-flex ms-3 flex-grow-1 align-items-center">
+            <span class="text-muted fw-500"><i class="bi bi-clock-history me-1"></i> Area Operativa <[user_role]> - Resort Paradise</span>
+          </div>
+
+          <div class="navbar-actions ms-auto">
+            <button class="icon-button theme-toggle" type="button" data-theme-toggle aria-label="Switch color theme" title="Switch color theme">
+              <i class="bi bi-moon-stars" data-theme-icon aria-hidden="true"></i>
+            </button>
+            
+            <div class="dropdown">
+              <button class="icon-button" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Notifications">
+                <[notification_badge]>
+                <i class="bi bi-bell"></i>
+              </button>
+              <div class="dropdown-menu dropdown-menu-end notification-menu shadow-sm border-0" style="width: 320px;">
+                <div class="dropdown-header fw-bold bg-light py-2">Notifiche Operative</div>
+                <[notifications_list]>
+              </div>
+            </div>
+
+            <div class="dropdown">
+              <button class="profile-button dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="avatar-initials" style="width:32px; height:32px; font-size:0.9rem;"><[user_initials]></div>
+                <span class="profile-name d-none d-sm-inline ms-2"><[user_name]></span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                <li><a class="dropdown-item" href="<[base]>/<[role_path]>/index.php"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a></li>
+                <li><a class="dropdown-item" href="<[base]>/index.php"><i class="bi bi-house me-2"></i> Sito Pubblico</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-danger" href="<[base]>/logout.php"><i class="bi bi-box-arrow-right me-2"></i> Esci</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <main class="dashboard-content">
+        <div class="container-fluid px-3 px-lg-4 py-4">
+          <[body]>
+        </div>
+      </main>
+
+      <footer class="admin-footer">
+        <div class="container-fluid px-3 px-lg-4 d-flex justify-content-between">
+          <span>&copy; 2026 ParadiseResort Management System.</span>
+          <span>Ruolo: <strong><[user_role]></strong></span>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <script src="<[base]>/skins/administration/assets/js/bootstrap.bundle.min.js"></script>
+  <script src="<[base]>/skins/administration/assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<div class="page-heading mb-4 d-flex justify-content-between align-items-center">
+  <div class="page-heading-copy">
+    <span class="page-icon"><i class="bi bi-tools"></i></span>
+    <div>
+      <p class="eyebrow mb-1">Manutenzione & Assistenza Tecnica</p>
+      <h1 class="h3 mb-1">Segnalazioni Guasti & Interventi in Camera</h1>
+      <p class="text-muted mb-0">Gestione e consultazione dei ticket tecnici aperti dagli ospiti e dai receptionist. La chiusura risolve il guasto e ripristina la disponibilità della camera.</p>
+    </div>
+  </div>
+  <div>
+    <a href="<[base]>/<[role_path]>/rooms.php" class="btn btn-outline-primary"><i class="bi bi-door-open me-1"></i> Stato Camere</a>
+  </div>
+</div>
+
+<[if!empty message]>
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="bi bi-check-circle-fill me-2"></i> <[message]>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+<[/if!empty]>
+
+<[if!empty error]>
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i> <[error]>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+<[/if!empty]>
+
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card shadow-sm border-0 rounded">
+      <div class="card-header bg-dark text-white py-3">
+        <h6 class="mb-0 fw-bold"><i class="bi bi-plus-circle me-2"></i> Nuova Segnalazione Guasto</h6>
+      </div>
+      <div class="card-body p-4">
+        <form action="<[base]>/<[role_path]>/segnalazioni.php" method="POST">
+          <input type="hidden" name="action" value="save_ticket">
+          
+          <div class="mb-3">
+            <label class="form-label fw-bold small">Seleziona Camera *</label>
+            <select name="room_id" class="form-select" required>
+              <[room_options]>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold small">Priorità Intervento *</label>
+            <select name="priority" class="form-select" required>
+              <option value="Low">Low (Lieve / Routine)</option>
+              <option value="Medium" selected>Medium (Normale)</option>
+              <option value="High">High (Urgente / Guasto Grave)</option>
+            </select>
+          </div>
+          <div class="mb-4">
+            <label class="form-label fw-bold small">Descrizione Problema / Guasto *</label>
+            <textarea name="issue_description" class="form-control" rows="4" placeholder="Es. Perdita acqua dal rubinetto del bagno o climatizzatore bloccato su E4..." required></textarea>
+          </div>
+          
+          <button type="submit" class="btn btn-danger w-100 fw-bold py-2"><i class="bi bi-send me-2"></i> Invia Ticket & Blocca Camera</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="card shadow-sm border-0 rounded">
+      <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 fw-bold"><i class="bi bi-wrench-adjustable me-2 text-primary"></i>Segnalazioni Attive da Risolvere</h6>
+        <span class="badge bg-warning text-dark">Ticket Aperti</span>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light">
+              <tr>
+                <th class="ps-4">ID</th>
+                <th>Camera & Categoria</th>
+                <th>Problema Segnalato</th>
+                <th>Segnalato Da</th>
+                <th>Priorità</th>
+                <th>Data Apertura</th>
+                <th class="text-end pe-4">Azione</th>
+              </tr>
+            </thead>
+            <tbody>
+              <[foreach]>
+              <tr>
+                <td class="ps-4 fw-bold text-muted">#<[tk_rows.id]></td>
+                <td>
+                  <strong class="d-block text-primary fs-6"><i class="bi bi-key me-1"></i> Cam. <[tk_rows.room_number]></strong>
+                  <small class="text-muted"><[tk_rows.category_name]></small>
+                </td>
+                <td class="small text-dark fw-bold" style="max-width: 240px;"><[tk_rows.issue]></td>
+                <td class="small text-muted"><[tk_rows.author]></td>
+                <td><[tk_rows.priority_badge]></td>
+                <td class="small text-muted"><[tk_rows.date]></td>
+                <td class="text-end pe-4">
+                  <a href="<[base]>/<[role_path]>/segnalazioni.php?close_id=<[tk_rows.id]>" class="btn btn-sm btn-success fw-bold" onclick="return confirm('Vuoi chiudere e segnare come risolto questo guasto? Il ticket verrà eliminato e la camera tornerà disponibile se non ha altri ticket.');" title="Risolvi e Chiudi Ticket">
+                    <i class="bi bi-check2-circle me-1"></i> Risolvi & Chiudi
+                  </a>
+                </td>
+              </tr>
+              <[/foreach]>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

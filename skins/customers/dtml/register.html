@@ -1,0 +1,88 @@
+<!-- Hero Title -->
+<div class="slider-area ">
+    <div class="single-slider hero-overly slider-height2 d-flex align-items-center" style="background-image: url('<[base]>/skins/customers/assets/img/hero/contact_hero.jpg'); background-size: cover; background-position: center;">
+        <div class="container">
+            <div class="row justify-content-center text-center">
+                <div class="col-xl-9">
+                    <div class="h1-slider-caption">
+                        <h1 data-animation="fadeInUp" data-delay=".4s">Crea Account</h1>
+                        <h3 data-animation="fadeInDown" data-delay=".4s">Unisciti al mondo ParadiseResort</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="contact-section pt-80 pb-80">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10">
+                <div class="card shadow-lg border-0 rounded-lg p-5" style="background: #fff;">
+                    <div class="text-center mb-4">
+                        <h2 class="contact-title mb-2">Registrazione Ospite</h2>
+                        <p class="text-muted">Compila il modulo per creare il tuo profilo e gestire le tue vacanze</p>
+                    </div>
+
+                    <[if!empty error]>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i> <[error]>
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    <[/if!empty]>
+
+                    <form class="form-contact contact_form" action="<[base]>/register.php" method="POST">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group mb-3">
+                                    <label class="font-weight-bold">Nome *</label>
+                                    <input class="form-control valid" name="first_name" id="first_name" type="text" placeholder="Es. Marco" value="<[first_name_val]>" required>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group mb-3">
+                                    <label class="font-weight-bold">Cognome *</label>
+                                    <input class="form-control valid" name="last_name" id="last_name" type="text" placeholder="Es. Rossi" value="<[last_name_val]>" required>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group mb-3">
+                                    <label class="font-weight-bold">Email *</label>
+                                    <input class="form-control valid" name="email" id="email" type="email" placeholder="nome@esempio.it" value="<[email_val]>" required>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group mb-3">
+                                    <label class="font-weight-bold">Telefono / Cellulare</label>
+                                    <input class="form-control valid" name="phone" id="phone" type="text" placeholder="+39 340 1234567" value="<[phone_val]>">
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group mb-4">
+                                    <label class="font-weight-bold">Password *</label>
+                                    <input class="form-control valid" name="password" id="password" type="password" placeholder="Minimo 6 caratteri" required>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group mb-4">
+                                    <label class="font-weight-bold">Conferma Password *</label>
+                                    <input class="form-control valid" name="confirm_password" id="confirm_password" type="password" placeholder="Ripeti la password" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group text-center mt-3">
+                            <button type="submit" class="btn btn1 w-100 py-3" style="font-size: 1.1rem;">Registra e Accedi</button>
+                        </div>
+                        
+                        <div class="text-center mt-4 pt-3 border-top">
+                            <p class="mb-0 text-muted">Hai già un account o fai parte dello Staff? <a href="<[base]>/login.php" class="text-primary font-weight-bold">Effettua il Login</a></p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

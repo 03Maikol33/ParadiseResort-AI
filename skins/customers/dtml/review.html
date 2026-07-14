@@ -1,0 +1,78 @@
+<!-- Hero Title -->
+<div class="slider-area ">
+    <div class="single-slider hero-overly slider-height2 d-flex align-items-center" style="background-image: url('<[base]>/skins/customers/assets/img/hero/contact_hero.jpg'); background-size: cover; background-position: center;">
+        <div class="container">
+            <div class="row justify-content-center text-center">
+                <div class="col-xl-9">
+                    <div class="h1-slider-caption">
+                        <h1 data-animation="fadeInUp" data-delay=".4s">Scrivi una Recensione</h1>
+                        <h3 data-animation="fadeInDown" data-delay=".4s">Condividi la tua opinione sul soggiorno a ParadiseResort</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="review-form-area pt-80 pb-90">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <[if!empty message]>
+                    <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                        <i class="fas fa-check-circle me-2"></i> <[message]>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                <[/if!empty]>
+
+                <[if!empty error]>
+                    <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i> <[error]>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                <[/if!empty]>
+
+                <div class="card shadow-lg border-0 rounded p-5 bg-white">
+                    <h3 class="font-weight-bold mb-3 border-bottom pb-3"><i class="fas fa-star text-warning me-2"></i> La Tua Esperienza al Resort</h3>
+                    <p class="text-muted small mb-4">Le recensioni verificate aiutano i futuri ospiti a scegliere la sistemazione ideale e consentono al nostro staff di migliorare costantemente i servizi.</p>
+
+                    <form action="<[base]>/send-review.php" method="POST">
+                        <input type="hidden" name="action" value="save_review">
+
+                        <div class="form-group mb-4">
+                            <label class="font-weight-bold text-dark small"><i class="fas fa-bed text-primary me-1"></i> Categoria Soggiornata (o Valutazione Generale)</label>
+                            <select name="room_category_id" class="form-control py-2">
+                                <[category_options]>
+                            </select>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label class="font-weight-bold text-dark small"><i class="fas fa-star-half-alt text-warning me-1"></i> Punteggio Soddisfazione *</label>
+                            <select name="rating" class="form-control py-2" required>
+                                <option value="5">★★★★★ - Eccellente (5 Stelle)</option>
+                                <option value="4">★★★★☆ - Molto Buono (4 Stelle)</option>
+                                <option value="3">★★★☆☆ - Nella Media (3 Stelle)</option>
+                                <option value="2">★★☆☆☆ - Sufficiente (2 Stelle)</option>
+                                <option value="1">★☆☆☆☆ - Insoddisfacente (1 Stella)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label class="font-weight-bold text-dark small"><i class="fas fa-comment-alt text-primary me-1"></i> Il tuo Commento *</label>
+                            <textarea name="comment" class="form-control" rows="6" placeholder="Racconta cosa ti ha colpito di più del soggiorno, la camera, i servizi extra o la ristorazione..." required></textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center border-top pt-4">
+                            <a href="<[base]>/reviews.php" class="text-muted font-weight-bold"><i class="fas fa-arrow-left me-1"></i> Torna alle Recensioni</a>
+                            <button type="submit" class="btn btn1 py-3 px-5 font-weight-bold"><i class="fas fa-paper-plane me-2"></i> Pubblica Recensione</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
