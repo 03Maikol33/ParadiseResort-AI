@@ -30,7 +30,7 @@ $config = [
         'port'    => 3306,
         'name'    => 'paradiseresort',
         'user'    => 'root',
-        'pass'    => 'root',
+        'pass'    => 'pass123',
         'charset' => 'utf8mb4',
     ],
 

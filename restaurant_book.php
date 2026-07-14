@@ -17,17 +17,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $error = 'Data o turno non validi. Seleziona una data da oggi in poi e un numero di ospiti corretto.';
     } else {
         try {
+            $mealType = ($timeSlot === 'Lunch') ? 'Pranzo' : 'Cena';
             // Controlla il limite di capienza (es. 50 coperti per turno)
-            $chk = db()->prepare('SELECT SUM(guests_count) as total_guests FROM restaurant_reservations WHERE reservation_date = ? AND time_slot = ? AND status != \'Cancelled\'');
-            $chk->execute([$resDate, $timeSlot]);
+            $chk = db()->prepare('SELECT SUM(guests) as total_guests FROM restaurant_reservations WHERE reservation_date = ? AND meal_type = ? AND status != \'Cancelled\'');
+            $chk->execute([$resDate, $mealType]);
             $row = $chk->fetch();
             $currentGuests = (int)($row['total_guests'] ?? 0);
 
             if ($currentGuests + $guestsCount > 60) {
                 $error = 'Spiacenti, per il turno di ' . ($timeSlot === 'Lunch' ? 'Pranzo' : 'Cena') . ' del ' . date('d/m/Y', strtotime($resDate)) . ' abbiamo raggiunto la capienza massima (60 coperti). Seleziona un\'altra data o turno.';
             } else {
-                $ins = db()->prepare('INSERT INTO restaurant_reservations (user_id, reservation_date, time_slot, guests_count, special_requests, status) VALUES (?, ?, ?, ?, ?, \'Confirmed\')');
-                $ins->execute([$userId, $resDate, $timeSlot, $guestsCount, $specialRequests]);
+                $resTime = ($timeSlot === 'Lunch') ? '13:00:00' : '20:00:00';
+                $ins = db()->prepare('INSERT INTO restaurant_reservations (user_id, reservation_date, meal_type, reservation_time, guests, status) VALUES (?, ?, ?, ?, ?, \'Confirmed\')');
+                $ins->execute([$userId, $resDate, $mealType, $resTime, $guestsCount]);
                 $message = 'Tavolo per ' . $guestsCount . ' persone prenotato con successo per il ' . date('d/m/Y', strtotime($resDate)) . ' (' . ($timeSlot === 'Lunch' ? 'Pranzo' : 'Cena') . ')!';
             }
         } catch (Exception $e) {
@@ -59,9 +61,9 @@ try {
     foreach ($resList as $r) {
         $block->setContent('res_rows.id', (string)$r['id']);
         $block->setContent('res_rows.date', date('d/m/Y', strtotime($r['reservation_date'])));
-        $block->setContent('res_rows.slot', $r['time_slot'] === 'Lunch' ? 'Pranzo (12:30 - 14:30)' : 'Cena (19:30 - 22:30)');
-        $block->setContent('res_rows.guests', (string)$r['guests_count']);
-        $block->setContent('res_rows.notes', htmlspecialchars($r['special_requests'] ?? '-'));
+        $block->setContent('res_rows.slot', $r['meal_type'] === 'Pranzo' ? 'Pranzo (12:30 - 14:30)' : 'Cena (19:30 - 22:30)');
+        $block->setContent('res_rows.guests', (string)$r['guests']);
+        $block->setContent('res_rows.notes', '-');
         
         $badge = $r['status'] === 'Confirmed' ? 'badge badge-success py-2 px-3' : 'badge badge-danger py-2 px-3';
         $block->setContent('res_rows.status_badge', '<span class="' . $badge . '">' . htmlspecialchars($r['status']) . '</span>');

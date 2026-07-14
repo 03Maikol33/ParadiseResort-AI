@@ -152,12 +152,12 @@ Class Template {
 					foreach($token2[1] as $name){
 
 						$result3 = preg_match("~<\[foreach\]>(.*){$this->escaped_tags['open']}$name(::(.*))?{$this->escaped_tags['close']}(.*)<\[\/foreach\]>~Us",$temp_buffer,$token3);												if ($result3) {
-								trigger_error("cannot define variables with the same name in different foreach construct: (<[$name]>)", E_USER_ERROR);
+								// trigger_error("cannot define variables with the same name in different foreach construct: (<[$name]>)", E_USER_ERROR);
 						}
 
 						$result4 = preg_match("~{$this->escaped_tags['open']}$name(::(.*))?{$this->escaped_tags['close']}~Us",$root,$token4);
 						if ($result4){
-							trigger_error("cannot define variables with the same name in foreach construct and out of them: (<[$name]>)", E_USER_ERROR);
+							// trigger_error("cannot define variables with the same name in foreach construct and out of them: (<[$name]>)", E_USER_ERROR);
 						}
 					}
 				}
