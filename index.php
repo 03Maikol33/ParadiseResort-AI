@@ -36,6 +36,12 @@ try {
         $block->setContent('reviews.comment', htmlspecialchars($rev['comment']));
         $stars = str_repeat('★', (int)$rev['rating']) . str_repeat('☆', 5 - (int)$rev['rating']);
         $block->setContent('reviews.stars', $stars);
+        
+        $initials = strtoupper(substr(trim($rev['first_name']), 0, 1) . substr(trim($rev['last_name']), 0, 1));
+        if ($initials === '') {
+            $initials = 'U';
+        }
+        $block->setContent('reviews.initials', htmlspecialchars($initials));
     }
 } catch (Exception $e) {
     // Ignora errori se la tabella recensioni è vuota

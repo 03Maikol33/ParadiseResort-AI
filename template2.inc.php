@@ -666,17 +666,17 @@ Class Template {
 			}
 		}
 
-		$this->setContent("server", $_SERVER['SERVER_NAME']);
-		$this->setContent("skin", isset($GLOBALS['config']['skin'])?$GLOBALS['config']['skin']:"" );
-		$this->setContent("base", isset($GLOBALS['config']['base'])?$GLOBALS['config']['base']:"" );
+		$this->setContentOnce("server", $_SERVER['SERVER_NAME']);
+		$this->setContentOnce("skin", isset($GLOBALS['config']['skin'])?$GLOBALS['config']['skin']:"" );
+		$this->setContentOnce("base", isset($GLOBALS['config']['base'])?$GLOBALS['config']['base']:"" );
 
 		if (isset($_SESSION['user'])) {
 
-			$this->setContent("user.username", $_SESSION['user']['username'] ?? 'unknown');
-			$this->setContent("user.name", $_SESSION['user']['name'] ?? 'unknown');
-			$this->setContent("user.surname", $_SESSION['user']['surname'] ?? 'unknown');
+			$this->setContentOnce("user.username", $_SESSION['user']['username'] ?? 'unknown');
+			$this->setContentOnce("user.name", $_SESSION['user']['name'] ?? 'unknown');
+			$this->setContentOnce("user.surname", $_SESSION['user']['surname'] ?? 'unknown');
 
-			$this->setContent("user.email", $_SESSION['user']['email'] ?? 'unknown');
+			$this->setContentOnce("user.email", $_SESSION['user']['email'] ?? 'unknown');
 		}
 
 		if ($this->cache->caching == TRUE){
