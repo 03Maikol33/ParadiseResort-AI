@@ -2,10 +2,7 @@
 require_once __DIR__ . '/../include/bootstrap.inc.php';
 
 require_login();
-if (!is_admin()) {
-    header('Location: ' . $config['base'] . '/login.php');
-    exit;
-}
+require_admin();
 
 $message = '';
 $error = '';
@@ -59,6 +56,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         try {
             $delGrp = db()->prepare('DELETE FROM user_gruppi WHERE user_id = ? AND group_id = ?');
             $delGrp->execute([$rUser, $rGroup]);
+            
+            // Se l'utente non ha più nessun gruppo, gli assegniamo il ruolo Guest (3)
+            $chkGrp = db()->prepare('SELECT COUNT(*) FROM user_gruppi WHERE user_id = ?');
+            $chkGrp->execute([$rUser]);
+            if ($chkGrp->fetchColumn() == 0) {
+                $insGuest = db()->prepare('INSERT INTO user_gruppi (user_id, group_id) VALUES (?, 3)');
+                $insGuest->execute([$rUser]);
+            }
+
             $message = 'Ruolo rimosso con successo per l\'utente #' . $rUser . '.';
         } catch (Exception $e) {
             $error = 'Errore durante la rimozione del ruolo.';

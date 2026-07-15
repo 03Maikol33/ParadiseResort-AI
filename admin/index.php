@@ -2,10 +2,7 @@
 require_once __DIR__ . '/../include/bootstrap.inc.php';
 
 require_login();
-if (!is_admin()) {
-    header('Location: ' . $config['base'] . '/login.php');
-    exit;
-}
+require_admin();
 
 $page = new_page('administration', 'frame-private');
 setup_backoffice_page($page, 'Amministratore', 'admin');

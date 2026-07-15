@@ -177,28 +177,30 @@
        <div class="row justify-content-center">
             <div class="col-xl-9 col-lg-9 col-md-9">
                 <div class="h1-testimonial-active">
+                    <!--controllo se no è empty-->
                     <[foreach]>
-                    <div class="single-testimonial pt-65">
-                        <div class="font-back-tittle mb-105">
-                            <div class="archivment-front">
-                                <img src="<[base]>/skins/customers/assets/img/logo/testimonial.png" alt="">
+                        <div class="single-testimonial pt-65">
+                            <div class="font-back-tittle mb-105">
+                                <div class="archivment-front">
+                                    <img src="<[base]>/skins/customers/assets/img/logo/testimonial.png" alt="">
+                                </div>
+                                <h3 class="archivment-back">Recensioni</h3>
                             </div>
-                            <h3 class="archivment-back">Recensioni</h3>
+                            <div class="testimonial-caption text-center">
+                                <p>“<[reviews.comment]>”</p>
+                                <div class="testimonial-ratting mb-2" style="color: #f3c114; font-size: 1.3rem;">
+                                    <[reviews.stars]>
+                                </div>
+                                <div class="rattiong-caption">
+                                    <span><[reviews.author]>, <span>Ospite in <[reviews.room_name]></span> </span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="testimonial-caption text-center">
-                            <p>“<[reviews.comment]>”</p>
-                            <div class="testimonial-ratting mb-2" style="color: #f3c114; font-size: 1.3rem;">
-                                <[reviews.stars]>
-                            </div>
-                            <div class="rattiong-caption">
-                                <span><[reviews.author]>, <span>Ospite in <[reviews.room_name]></span> </span>
-                            </div>
-                        </div>
-                    </div>
                     <[/foreach]>
                 </div>
             </div>
        </div>
     </div>
 </div>
+
 <!-- Testimonial End -->

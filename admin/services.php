@@ -2,10 +2,7 @@
 require_once __DIR__ . '/../include/bootstrap.inc.php';
 
 require_login();
-if (!is_admin()) {
-    header('Location: ' . $config['base'] . '/login.php');
-    exit;
-}
+require_admin();
 
 $message = '';
 $error = '';
@@ -36,9 +33,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             db()->beginTransaction();
             db()->exec('DELETE FROM group_services');
             
+            // L'amministratore (Group 1) ha SEMPRE accesso a tutti i servizi
+            $stmtServices = db()->query('SELECT id FROM services');
+            $allServices = $stmtServices->fetchAll(PDO::FETCH_COLUMN);
+            $insPerm = db()->prepare('INSERT INTO group_services (group_id, service_id) VALUES (?, ?)');
+            foreach ($allServices as $sId) {
+                $insPerm->execute([1, $sId]);
+            }
+
             if (!empty($_POST['perm']) && is_array($_POST['perm'])) {
-                $insPerm = db()->prepare('INSERT INTO group_services (group_id, service_id) VALUES (?, ?)');
                 foreach ($_POST['perm'] as $groupId => $srvList) {
+                    if ((int)$groupId === 1) continue; // Salta il gruppo 1 perché l'abbiamo già gestito d'ufficio
                     if (is_array($srvList)) {
                         foreach ($srvList as $serviceId => $val) {
                             $insPerm->execute([(int)$groupId, (int)$serviceId]);
@@ -55,6 +60,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             if (db()->inTransaction()) db()->rollBack();
             $error = 'Errore durante il salvataggio della matrice permessi: ' . $e->getMessage();
         }
+    }
+} elseif (!empty($_GET['del_service_id'])) {
+    $delId = (int)$_GET['del_service_id'];
+    try {
+        db()->beginTransaction();
+        $delPerms = db()->prepare('DELETE FROM group_services WHERE service_id = ?');
+        $delPerms->execute([$delId]);
+        $del = db()->prepare('DELETE FROM services WHERE id = ?');
+        $del->execute([$delId]);
+        db()->commit();
+        $message = 'Servizio #' . $delId . ' eliminato con successo.';
+    } catch (Exception $e) {
+        if (db()->inTransaction()) db()->rollBack();
+        $error = 'Errore durante l\'eliminazione del servizio: ' . $e->getMessage();
     }
 }
 

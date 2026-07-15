@@ -2,10 +2,7 @@
 require_once __DIR__ . '/../include/bootstrap.inc.php';
 
 require_login();
-if (!is_receptionist()) {
-    header('Location: ' . $config['base'] . '/login.php');
-    exit;
-}
+require_service();
 
 $search = trim($_GET['search'] ?? '');
 
