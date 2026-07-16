@@ -106,3 +106,6 @@ INSERT INTO maintenance_tickets (room_id, reported_by_user_id, status_id, issue_
 INSERT INTO restaurant_reservations (user_id, reservation_date, meal_type, reservation_time, guests, status) VALUES
 (3, '2026-08-01', 'Cena', '20:30', 2, 'Confirmed'),
 (4, '2026-08-02', 'Pranzo', '13:00', 4, 'Pending');
+
+
+//prova commit
