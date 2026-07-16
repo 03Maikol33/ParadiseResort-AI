@@ -41,7 +41,7 @@ try {
     $sql = '
         SELECT r.*, rc.name as category_name, rc.capacity
         FROM rooms r
-        JOIN room_categories rc ON r.room_category_id = rc.id
+        JOIN room_categories rc ON r.category_id = rc.id
         WHERE 1=1
     ';
     $params = [];

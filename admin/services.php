@@ -4,8 +4,9 @@ require_once __DIR__ . '/../include/bootstrap.inc.php';
 require_login();
 require_admin();
 
-$message = '';
-$error = '';
+$message = $_SESSION['flash_message'] ?? '';
+$error   = $_SESSION['flash_error'] ?? '';
+unset($_SESSION['flash_message'], $_SESSION['flash_error']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if ($_POST['action'] === 'add_service') {
@@ -16,24 +17,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $ins = db()->prepare('INSERT INTO services (script_name, description) VALUES (?, ?)');
                 $ins->execute([$scriptName, $description]);
                 
-                // Assegna automaticamente all'Admin
                 $newId = db()->lastInsertId();
                 $insGrp = db()->prepare('INSERT INTO group_services (group_id, service_id) VALUES (1, ?)');
                 $insGrp->execute([$newId]);
                 
-                $message = 'Nuovo servizio (' . htmlspecialchars($scriptName) . ') registrato con successo.';
+                $_SESSION['flash_message'] = 'Nuovo servizio (' . htmlspecialchars($scriptName) . ') registrato con successo.';
             } catch (Exception $e) {
-                $error = 'Errore durante l\'inserimento: ' . $e->getMessage();
+                $_SESSION['flash_error'] = 'Errore durante l\'inserimento: ' . $e->getMessage();
             }
         } else {
-            $error = 'Il nome dello script è obbligatorio.';
+            $_SESSION['flash_error'] = 'Il nome dello script è obbligatorio.';
         }
+        header('Location: ' . $config['base'] . '/admin/services.php');
+        exit;
     } elseif ($_POST['action'] === 'save_matrix') {
         try {
             db()->beginTransaction();
             db()->exec('DELETE FROM group_services');
             
-            // L'amministratore (Group 1) ha SEMPRE accesso a tutti i servizi
+            // L'amministratore (Group 1) ha SEMPRE accesso a tutti i servizi d'ufficio (impossibile rimuovere permessi ad Admin)
             $stmtServices = db()->query('SELECT id FROM services');
             $allServices = $stmtServices->fetchAll(PDO::FETCH_COLUMN);
             $insPerm = db()->prepare('INSERT INTO group_services (group_id, service_id) VALUES (?, ?)');
@@ -43,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
             if (!empty($_POST['perm']) && is_array($_POST['perm'])) {
                 foreach ($_POST['perm'] as $groupId => $srvList) {
-                    if ((int)$groupId === 1) continue; // Salta il gruppo 1 perché l'abbiamo già gestito d'ufficio
+                    if ((int)$groupId === 1) continue; // Salta il gruppo 1 perché ha già tutti i permessi garantiti d'ufficio
                     if (is_array($srvList)) {
                         foreach ($srvList as $serviceId => $val) {
                             $insPerm->execute([(int)$groupId, (int)$serviceId]);
@@ -53,13 +55,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             }
             db()->commit();
             
-            // Ricarica servizi dell'admin in sessione
             $_SESSION['user']['services'] = load_user_services((int)$_SESSION['user']['id']);
-            $message = 'Matrice dei permessi RBAC salvata e aggiornata con successo!';
+            $_SESSION['flash_message'] = 'Matrice dei permessi RBAC salvata e aggiornata con successo!';
         } catch (Exception $e) {
             if (db()->inTransaction()) db()->rollBack();
-            $error = 'Errore durante il salvataggio della matrice permessi: ' . $e->getMessage();
+            $_SESSION['flash_error'] = 'Errore durante il salvataggio della matrice permessi: ' . $e->getMessage();
         }
+        header('Location: ' . $config['base'] . '/admin/services.php');
+        exit;
     }
 } elseif (!empty($_GET['del_service_id'])) {
     $delId = (int)$_GET['del_service_id'];
@@ -70,11 +73,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $del = db()->prepare('DELETE FROM services WHERE id = ?');
         $del->execute([$delId]);
         db()->commit();
-        $message = 'Servizio #' . $delId . ' eliminato con successo.';
+        
+        $_SESSION['user']['services'] = load_user_services((int)$_SESSION['user']['id']);
+        $_SESSION['flash_message'] = 'Servizio #' . $delId . ' eliminato dal database con successo.';
     } catch (Exception $e) {
         if (db()->inTransaction()) db()->rollBack();
-        $error = 'Errore durante l\'eliminazione del servizio: ' . $e->getMessage();
+        $_SESSION['flash_error'] = 'Errore durante l\'eliminazione del servizio: ' . $e->getMessage();
     }
+    header('Location: ' . $config['base'] . '/admin/services.php');
+    exit;
 }
 
 $page = new_page('administration', 'frame-private');

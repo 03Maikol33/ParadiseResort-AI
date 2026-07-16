@@ -90,12 +90,14 @@
 /* 4. Testimonial Active*/
   var testimonial = $('.h1-testimonial-active');
     if(testimonial.length){
+    var slideCount = testimonial.find('.single-testimonial').length;
+    var isMultiSlide = slideCount > 1;
     testimonial.slick({
         dots: false,
-        infinite: true,
+        infinite: isMultiSlide,
         speed: 1000,
-        autoplay:false,
-        arrows: true,
+        autoplay: isMultiSlide,
+        arrows: isMultiSlide,
         prevArrow: '<button type="button" class="slick-prev"><i class="ti-angle-left"></i></button>',
         nextArrow: '<button type="button" class="slick-next"><i class="ti-angle-right"></i></button>',
         slidesToShow: 1,
@@ -106,9 +108,9 @@
             settings: {
               slidesToShow: 1,
               slidesToScroll: 1,
-              infinite: true,
+              infinite: isMultiSlide,
               dots: false,
-              arrow:true
+              arrows: isMultiSlide
             }
           },
           {
@@ -124,12 +126,12 @@
             settings: {
               slidesToShow: 1,
               slidesToScroll: 1,
-              arrows:false,
+              arrows:false
             }
           }
         ]
-      });
-    }
+    });
+  }
 
 
 /* 5. Gallery Active */
@@ -218,7 +220,10 @@
     
 // 11. ---- Mailchimp js --------//  
     function mailChimp() {
-      $('#mc_embed_signup').find('form').ajaxChimp();
+      var $form = $('#mc_embed_signup').find('form');
+      if ($form.length && typeof $form.ajaxChimp === 'function') {
+        $form.ajaxChimp();
+      }
     }
     mailChimp();
 

@@ -179,6 +179,7 @@
                 <div class="h1-testimonial-active">
                     <!--controllo se no è empty-->
                     <[foreach]>
+                        <[if!empty reviews.author]>
                         <div class="single-testimonial pt-65">
                             <div class="font-back-tittle mb-105">
                                 <div class="archivment-front">
@@ -198,6 +199,7 @@
                                 </div>
                             </div>
                         </div>
+                        <[/if!empty]>
                     <[/foreach]>
                 </div>
             </div>

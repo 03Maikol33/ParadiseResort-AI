@@ -1,0 +1,55 @@
+<?php
+
+/*
+  File di configurazione di esempio.
+  Copia questo file in config.inc.php e modifica i parametri per il tuo ambiente locale.
+ */
+
+define('NONE',   0);
+define('FILE',   1);
+define('MEMORY', 2);
+
+$basePath = '';
+if (!empty($_SERVER['SCRIPT_NAME'])) {
+    $scriptName = str_replace('\\', '/', $_SERVER['SCRIPT_NAME']);
+    $pos = stripos($scriptName, '/progettoAi');
+    if ($pos !== false) {
+        $basePath = substr($scriptName, 0, $pos + strlen('/progettoAi'));
+    }
+}
+if ($basePath === '') {
+    $docRoot = str_replace('\\', '/', realpath($_SERVER['DOCUMENT_ROOT'] ?? ''));
+    $projRoot = str_replace('\\', '/', realpath(__DIR__ . '/..'));
+    if (!empty($docRoot) && strpos(strtolower($projRoot), strtolower($docRoot)) === 0) {
+        $basePath = substr($projRoot, strlen($docRoot));
+    }
+}
+if ($basePath === false || $basePath === null) {
+    $basePath = '/progettoAi';
+}
+$basePath = rtrim($basePath, '/');
+
+$config = [
+
+    'db' => [
+        'host'    => 'localhost',
+        'port'    => 3306,
+        'name'    => 'paradiseresort',
+        'user'    => 'root',
+        'pass'    => 'root', // Inserire la password del proprio database MySQL locale
+        'charset' => 'utf8mb4',
+    ],
+
+    'skin'         => 'customers',
+    'admin_skin'   => 'administration',
+    'base'         => $basePath,
+    'upload_dir'   => 'uploads',
+
+    'cache_folder'  => 'cache',
+    'cache_mode'    => NONE,
+    'cache_timeout' => 600,
+
+    'languages'        => [],
+    'currentlanguage'  => 'it',
+    'currenttab'       => '',
+];

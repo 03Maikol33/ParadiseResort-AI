@@ -101,6 +101,10 @@ Class Template {
     	$i=0;
 
     	$this->setTagStyle(SQUARE);
+		$this->content = array();
+		$this->content[0] = array();
+		$this->content[1] = array();
+		$this->content[2] = "";
 	}
 
 	function setTemplateCode($code) {
@@ -199,7 +203,7 @@ Class Template {
 		$counter_foreach_closed = 0;
 
 		do{
-			$result = preg_match("~(<\[if\!empty\s(\w+)\]>)|(<\[\/if\!empty\]>)~Us",$temp_buffer,$token);
+			$result = preg_match("~(<\[if\!empty\s([\w\.]+)\]>)|(<\[\/if\!empty\]>)~Us",$temp_buffer,$token);
 
 			if($result){
 				if(substr($token[1], 0, 10) == "<[if!empty") {
@@ -207,7 +211,7 @@ Class Template {
 				} else {
 					$counter_foreach_closed++;
 				}
-				$temp_buffer = preg_replace("~<\[if\!empty\s(\w+)\]>|<\[\/if\!empty\]>~Us","",$temp_buffer,1);
+				$temp_buffer = preg_replace("~<\[if\!empty\s([\w\.]+)\]>|<\[\/if\!empty\]>~Us","",$temp_buffer,1);
 			}
 
 			if ($counter_foreach_opened < $counter_foreach_closed){
@@ -231,16 +235,16 @@ Class Template {
 		$counter_foreach_closed = 0;
 
 		do{
-			$result = preg_match("~(<\[ifempty\s(\w+)\]>)|(<\[\/ifempty\]>)~Us",$temp_buffer,$token);
+			$result = preg_match("~(<\[ifempty\s([\w\.]+)\]>)|(<\[\/ifempty\]>)~Us",$temp_buffer,$token);
 
 			if($result){
 
-				if(substr($token[1], 0, 9) == "<[ifempty") {
+				if(substr($token[1], 0, 10) == "<[ifempty ") {
 					$counter_foreach_opened++;
 				} else {
 					$counter_foreach_closed++;
 				}
-				$temp_buffer = preg_replace("~<\[ifempty\s(\w+)\]>|<\[\/ifempty\]>~Us","",$temp_buffer,1);
+				$temp_buffer = preg_replace("~<\[ifempty\s([\w\.]+)\]>|<\[\/ifempty\]>~Us","",$temp_buffer,1);
 			}
 
 			if ($counter_foreach_opened < $counter_foreach_closed){
@@ -261,16 +265,24 @@ Class Template {
 		$temp_buffer = $buffer;
 
 		do{
-			$result = preg_match("~<\[if!empty\s(\w+)\]>(.*)<\[\/if!empty\]>~Us",$temp_buffer,$token);
+			$result = preg_match("~<\[if!empty\s([\w\.]+)\]>(.*)<\[\/if!empty\]>~Us",$temp_buffer,$token);
 
 			$field = isset($token[1]) ? $token[1] : '';
 			$core = isset($token[2]) ? $token[2] : '';
 
 			if ($result){
+				$val = "";
+				if (isset($this->content[$field])) {
+					$val = $this->content[$field];
+				} elseif (isset($this->content[0]) && is_array($this->content[0])) {
+					$idx = array_search($field, $this->content[0]);
+					if ($idx !== false && isset($this->content[1][$idx])) {
+						$val = $this->content[1][$idx];
+					}
+				}
 
-				if (isset($this->content[$field]) and ($this->content[$field] != "")) {
+				if ($val != "") {
 					$temp_buffer = str_replace("<[if!empty {$field}]>{$core}<[/if!empty]>", "{$core}", $temp_buffer);
-
 				} else {
 					$temp_buffer = str_replace("<[if!empty {$field}]>{$core}<[/if!empty]>", "", $temp_buffer);
 				}
@@ -287,15 +299,24 @@ Class Template {
 		$temp_buffer = $buffer;
 
 		do{
-			$result = preg_match("~<\[ifempty\s(\w+)\]>(.*)<\[\/ifempty\]>~Us",$temp_buffer,$token);
+			$result = preg_match("~<\[ifempty\s([\w\.]+)\]>(.*)<\[\/ifempty\]>~Us",$temp_buffer,$token);
 
 			$field = isset($token[1]) ? $token[1] : '';
 			$core = isset($token[2]) ? $token[2] : '';
 
 			if ($result){
-				if (isset($this->content[$field]) and ($this->content[$field] == "")) {
-					$temp_buffer = str_replace("<[ifempty {$field}]>{$core}<[/ifempty]>", "{$core}", $temp_buffer);
+				$val = "";
+				if (isset($this->content[$field])) {
+					$val = $this->content[$field];
+				} elseif (isset($this->content[0]) && is_array($this->content[0])) {
+					$idx = array_search($field, $this->content[0]);
+					if ($idx !== false && isset($this->content[1][$idx])) {
+						$val = $this->content[1][$idx];
+					}
+				}
 
+				if ($val == "") {
+					$temp_buffer = str_replace("<[ifempty {$field}]>{$core}<[/ifempty]>", "{$core}", $temp_buffer);
 				} else {
 					$temp_buffer = str_replace("<[ifempty {$field}]>{$core}<[/ifempty]>", "", $temp_buffer);
 				}
@@ -351,6 +372,16 @@ Class Template {
 			trigger_error('$name cannot be a '.gettype($name).' must be a string', E_USER_WARNING);
 		}
 
+		if (!is_array($this->content)) {
+			$this->content = array(0 => array(), 1 => array(), 2 => "");
+		}
+		if (!isset($this->content[0]) || !is_array($this->content[0])) {
+			$this->content[0] = array();
+		}
+		if (!isset($this->content[1]) || !is_array($this->content[1])) {
+			$this->content[1] = array();
+		}
+
 		$this->content[$name] = $value;
 		$this->content[0][]=$name;
 		$this->content[1][]=$value;
@@ -361,11 +392,13 @@ Class Template {
 	function setContentOnce($name, $value, $pars = "") {
 
 		$trovato = false;
-		foreach($this->content[0] as $k => $v) {
-			if ($v == $name) {
-				$trovato = true;
-				$index = $k;
+		if (isset($this->content[0]) && is_array($this->content[0])) {
+			foreach($this->content[0] as $k => $v) {
+				if ($v == $name) {
+					$trovato = true;
+					$index = $k;
 
+				}
 			}
 		}
 
@@ -382,17 +415,24 @@ Class Template {
 		}
 
 		$trovato = false;
-		foreach($this->content[0] as $k => $v) {
-			if ($v == $name) {
-				$trovato = true;
-				$index = $k;
+		if (isset($this->content[0]) && is_array($this->content[0])) {
+			foreach($this->content[0] as $k => $v) {
+				if ($v == $name) {
+					$trovato = true;
+					$index = $k;
 
+				}
 			}
 		}
 
 		if ($trovato) {
-
+			if (!isset($this->content[1][$index])) {
+				$this->content[1][$index] = "";
+			}
 			$this->content[1][$index] .= $value;
+			if (!isset($this->content[2])) {
+				$this->content[2] = "";
+			}
 			$this->content[2] .= $pars;
 
 		} else {
@@ -404,6 +444,13 @@ Class Template {
 	function loadContent($content){
 
 		$finalContent = array();
+		$finalContent[0] = array();
+		$finalContent[1] = array();
+		$finalContent[2] = "";
+
+		if (!is_array($content) || !isset($content[0]) || !is_array($content[0]) || !isset($content[1]) || !is_array($content[1])) {
+			return $finalContent;
+		}
 
 		$contentKeys=$content[0];
 		$contentValue=$content[1];
@@ -417,17 +464,37 @@ Class Template {
 					foreach($parsedContent as $currentParsedContentName=>$currentParsedContentValue){
 						$finalContent[0][] = $currentParsedContentName;
 						$finalContent[1][] = $currentParsedContentValue;
+						$finalContent[$currentParsedContentName] = $currentParsedContentValue;
 					}
+				} else {
+					$finalContent[0][] = $placeholderName;
+					$finalContent[1][] = $placeholderValue;
+					$finalContent[$placeholderName] = $placeholderValue;
 				}
 			} else {// Se non ? un contenuto iterato
 				$parsedContent = $this->transformContent($contentKeys[$i],$contentValue[$i],$this->buffer);
 				if (is_array($parsedContent)) {
-				foreach($parsedContent as $currentParsedContentName=>$currentParsedContentValue){
-					$finalContent[0][] = $currentParsedContentName;
-					$finalContent[1][] = $currentParsedContentValue;
-				}
+					foreach($parsedContent as $currentParsedContentName=>$currentParsedContentValue){
+						$finalContent[0][] = $currentParsedContentName;
+						$finalContent[1][] = $currentParsedContentValue;
+						$finalContent[$currentParsedContentName] = $currentParsedContentValue;
+					}
+				} else {
+					$finalContent[0][] = $placeholderName;
+					$finalContent[1][] = $placeholderValue;
+					$finalContent[$placeholderName] = $placeholderValue;
 				}
 			}
+		}
+
+		if (!isset($finalContent[0]) || !is_array($finalContent[0])) {
+			$finalContent[0] = array();
+		}
+		if (!isset($finalContent[1]) || !is_array($finalContent[1])) {
+			$finalContent[1] = array();
+		}
+		if (!isset($finalContent[2])) {
+			$finalContent[2] = isset($content[2]) ? $content[2] : "";
 		}
 
 		return $finalContent;
@@ -652,13 +719,15 @@ Class Template {
 			if (($_REQUEST['mode'] == "ajax") or
 			    ($_REQUEST['mode'] == "compact")) {
 
-				foreach($this->content[0] as $index => $name) {
-					if ($name == "body") {
-						$position = $index;
+				if (isset($this->content[0]) && is_array($this->content[0])) {
+					foreach($this->content[0] as $index => $name) {
+						if ($name == "body") {
+							$position = $index;
+						}
 					}
 				}
 
-				$this->buffer = $this->content[1][$position];
+				$this->buffer = (isset($position) && isset($this->content[1][$position])) ? $this->content[1][$position] : "";
 
 			} else {
 
@@ -694,6 +763,8 @@ Class Template {
 					$this->buffer = $this->NotEmpty($this->buffer);
 			  		$this->content = $this->loadContent($this->content);
 					$this->buffer = $this->foreach->bindAll($this->content,$this->buffer);
+					$this->buffer = $this->parseIfNotEmpty($this->buffer);
+					$this->buffer = $this->parseIfEmpty($this->buffer);
 					$this->buffer = $this->loadEmptyContent($this->buffer);
 					$this->buffer = $this->cache->buildCacheFile($this->buffer,$this->template_file);
 
@@ -710,6 +781,8 @@ Class Template {
 
 				$this->content = $this->loadContent($this->content);
 				$this->buffer = $this->foreach->bindAll($this->content,$this->buffer);
+				$this->buffer = $this->parseIfNotEmpty($this->buffer);
+				$this->buffer = $this->parseIfEmpty($this->buffer);
 				$this->buffer = $this->loadEmptyContent($this->buffer);
 				$this->buffer = $this->cache->buildCacheFile($this->buffer,$this->template_file);
 
@@ -730,6 +803,8 @@ Class Template {
 
 			$this->content = $this->loadContent($this->content);
 			$this->buffer = $this->foreach->bindAll($this->content,$this->buffer);
+			$this->buffer = $this->parseIfNotEmpty($this->buffer);
+			$this->buffer = $this->parseIfEmpty($this->buffer);
 			$this->buffer = $this->loadEmptyContent($this->buffer);
 
 		}
@@ -1128,7 +1203,7 @@ Class ForeachCode {
 		}
 	}
 	function bindAll($content,$buffer){
-		if($content){
+		if($content && is_array($content) && isset($content[0]) && is_array($content[0]) && isset($content[1]) && is_array($content[1])){
 			$contentKeys=$content[0];
 			$contentValue=$content[1];
 		}
