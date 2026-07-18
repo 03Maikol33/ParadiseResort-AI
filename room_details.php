@@ -27,7 +27,8 @@ $block->setContent('room.name', htmlspecialchars($cat['name']));
 $block->setContent('room.description', htmlspecialchars($cat['description'] ?? ''));
 $block->setContent('room.base_price', number_format((float)$cat['base_price'], 2, ',', '.'));
 $block->setContent('room.capacity', (string)$cat['capacity']);
-$block->setContent('room.image_url', htmlspecialchars($cat['image_url'] ?? 'deluxe_singola.jpg'));
+$imageUrl = !empty($cat['image_url']) ? $cat['image_url'] : 'deluxe_singola.jpg';
+$block->setContent('room.image_url', htmlspecialchars($imageUrl));
 $block->setContent('val_check_in', htmlspecialchars($checkIn));
 $block->setContent('val_check_out', htmlspecialchars($checkOut));
 

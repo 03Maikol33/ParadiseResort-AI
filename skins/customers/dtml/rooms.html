@@ -20,8 +20,11 @@
         <div class="card shadow-sm border-0 p-4 rounded bg-light">
             <form action="<[base]>/rooms.php" method="GET" class="row align-items-end">
                 <div class="col-md-3 mb-3">
-                    <label class="font-weight-bold text-dark small">Parola Chiave / Tipo</label>
-                    <input type="text" name="filter" class="form-control" placeholder="es. Vista Mare, Suite..." value="<[val_filter]>">
+                    <label class="font-weight-bold text-dark small">Tipologia Camera</label>
+                    <select name="room_type" class="form-control" required>
+                        <option value="">Seleziona Tipologia</option>
+                        <[room_options]>
+                    </select>
                 </div>
                 <div class="col-md-2 mb-3">
                     <label class="font-weight-bold text-dark small">Ospiti Minimi</label>
@@ -40,11 +43,11 @@
                 </div>
                 <div class="col-md-2 mb-3">
                     <label class="font-weight-bold text-dark small">Check In</label>
-                    <input type="text" name="check_in" class="form-control" placeholder="gg/mm/aaaa" value="<[val_check_in]>">
+                    <input type="date" name="check_in" class="form-control" value="<[val_check_in]>" required>
                 </div>
                 <div class="col-md-2 mb-3">
                     <label class="font-weight-bold text-dark small">Check Out</label>
-                    <input type="text" name="check_out" class="form-control" placeholder="gg/mm/aaaa" value="<[val_check_out]>">
+                    <input type="date" name="check_out" class="form-control" value="<[val_check_out]>" required>
                 </div>
                 <div class="col-md-1 mb-3">
                     <button type="submit" class="btn btn1 w-100 py-2"><i class="fas fa-search"></i></button>
@@ -58,15 +61,16 @@
 <section class="room-area pt-30 pb-90">
     <div class="container">
         <div class="row">
+            <[if!empty has_results]>
             <[foreach]>
             <div class="col-xl-6 col-lg-6 col-md-6">
                 <div class="single-room mb-50 shadow-sm border rounded overflow-hidden bg-white">
                     <div class="room-img position-relative">
-                       <a href="<[base]>/room_details.php<[rooms_list.link_params]>"><img src="<[base]>/skins/customers/assets/img/rooms/<[rooms_list.image_url]>" alt="<[rooms_list.name]>" style="height: 350px; width: 100%; object-fit: cover;"></a>
+                       <a href="<[rooms_list.base]>/room_details.php<[rooms_list.link_params]>"><img src="<[rooms_list.base]>/skins/customers/assets/img/rooms/<[rooms_list.image_url]>" alt="<[rooms_list.name]>" style="height: 350px; width: 100%; object-fit: cover;"></a>
                     </div>
                     <div class="room-caption p-4">
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h3 class="mb-0"><a href="<[base]>/room_details.php<[rooms_list.link_params]>" class="text-dark font-weight-bold"><[rooms_list.name]></a></h3>
+                            <h3 class="mb-0"><a href="<[rooms_list.base]>/room_details.php<[rooms_list.link_params]>" class="text-dark font-weight-bold"><[rooms_list.name]></a></h3>
                             <span class="badge badge-info py-2 px-3"><i class="fas fa-users me-1"></i> Max <[rooms_list.capacity]> Ospiti</span>
                         </div>
                         <div class="per-night mb-3">
@@ -74,13 +78,19 @@
                         </div>
                         <p class="text-muted mb-4"><[rooms_list.description]></p>
                         <div class="d-flex justify-content-between align-items-center border-top pt-3">
-                            <a href="<[base]>/room_details.php<[rooms_list.link_params]>" class="text-primary font-weight-bold">Esplora Dettagli & Servizi <i class="fas fa-arrow-right ml-1"></i></a>
-                            <a href="<[base]>/room_details.php<[rooms_list.link_params]>" class="btn btn-sm">Prenota Ora</a>
+                            <a href="<[rooms_list.base]>/room_details.php<[rooms_list.link_params]>" class="text-primary font-weight-bold">Esplora Dettagli & Servizi <i class="fas fa-arrow-right ml-1"></i></a>
+                            <a href="<[rooms_list.base]>/room_details.php<[rooms_list.link_params]>" class="btn btn-sm">Prenota Ora</a>
                         </div>
                     </div>
                 </div>
             </div>
             <[/foreach]>
+            <[/if!empty]>
+            <[ifempty has_results]>
+            <div class="col-12 text-center py-5">
+                <h4>Nessuna camera disponibile per i filtri selezionati.</h4>
+            </div>
+            <[/ifempty]>
         </div>
     </div>
 </section>

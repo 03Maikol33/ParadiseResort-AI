@@ -9,11 +9,13 @@ try {
     $featuredRooms = $stmtRooms->fetchAll();
     
     foreach ($featuredRooms as $i => $room) {
+        $block->setContent('featured_rooms.base', $GLOBALS['config']['base'] ?? '');
         $block->setContent('featured_rooms.id', (string)$room['id']);
         $block->setContent('featured_rooms.name', htmlspecialchars($room['name']));
         $block->setContent('featured_rooms.base_price', number_format((float)$room['base_price'], 2, ',', '.'));
         $block->setContent('featured_rooms.capacity', (string)$room['capacity']);
-        $block->setContent('featured_rooms.image_url', htmlspecialchars($room['image_url'] ?? 'deluxe_singola.jpg'));
+        $imageUrl = !empty($room['image_url']) ? $room['image_url'] : 'deluxe_singola.jpg';
+        $block->setContent('featured_rooms.image_url', htmlspecialchars($imageUrl));
         $block->setContent('featured_rooms.description', htmlspecialchars($room['description'] ?? ''));
     }
 } catch (Exception $e) {
