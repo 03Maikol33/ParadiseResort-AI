@@ -78,7 +78,9 @@
                 <th>Segnalato Da</th>
                 <th>Priorità</th>
                 <th>Data Apertura</th>
-                <th class="text-end pe-4">Azione</th>
+                <[if!empty is_admin_role]>
+                  <th class="text-end pe-4">Azione</th>
+                <[/if!empty]>
               </tr>
             </thead>
             <tbody>
@@ -93,11 +95,13 @@
                 <td class="small text-muted"><[tk_rows.author]></td>
                 <td><[tk_rows.priority_badge]></td>
                 <td class="small text-muted"><[tk_rows.date]></td>
-                <td class="text-end pe-4">
-                  <a href="<[base]>/<[role_path]>/segnalazioni.php?close_id=<[tk_rows.id]>" class="btn btn-sm btn-success fw-bold" onclick="return confirm('Vuoi chiudere e segnare come risolto questo guasto? Il ticket verrà eliminato e la camera tornerà disponibile se non ha altri ticket.');" title="Risolvi e Chiudi Ticket">
-                    <i class="bi bi-check2-circle me-1"></i> Risolvi & Chiudi
-                  </a>
-                </td>
+                <[if!empty is_admin_role]>
+                  <td class="text-end pe-4">
+                    <a href="<[base]>/<[role_path]>/segnalazioni.php?close_id=<[tk_rows.id]>" class="btn btn-sm btn-success fw-bold" onclick="return confirm('Vuoi chiudere e segnare come risolto questo guasto? Il ticket verrà eliminato e la camera tornerà disponibile se non ha altri ticket.');" title="Risolvi e Chiudi Ticket">
+                      <i class="bi bi-check2-circle me-1"></i> Risolvi & Chiudi
+                    </a>
+                  </td>
+                <[/if!empty]>
               </tr>
               <[/foreach]>
             </tbody>

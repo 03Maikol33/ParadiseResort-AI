@@ -15,7 +15,7 @@ try {
         FROM invoices i
         JOIN bookings b ON i.booking_id = b.id
         JOIN rooms r ON b.room_id = r.id
-        JOIN room_categories rc ON r.room_category_id = rc.id
+        JOIN room_categories rc ON r.category_id = rc.id
         JOIN users u ON b.user_id = u.id
         JOIN booking_statuses bs ON b.status_id = bs.id
         WHERE i.id = ?
@@ -41,9 +41,10 @@ $page = new_page('customers', 'frame-public');
 $block = new_block('invoice');
 
 $block->setContent('success', $success);
+$invNumber = 'INV-' . date('Y', strtotime($inv['invoice_date'])) . '-' . str_pad($inv['booking_id'], 5, '0', STR_PAD_LEFT);
 $block->setContent('invoice.id', (string)$inv['id']);
-$block->setContent('invoice.number', htmlspecialchars($inv['invoice_number']));
-$block->setContent('invoice.issued_date', date('d/m/Y H:i', strtotime($inv['issued_date'])));
+$block->setContent('invoice.number', htmlspecialchars($invNumber));
+$block->setContent('invoice.issued_date', date('d/m/Y H:i', strtotime($inv['invoice_date'])));
 $block->setContent('invoice.status_name', htmlspecialchars($inv['status_name']));
 
 $block->setContent('guest.name', htmlspecialchars($inv['first_name'] . ' ' . $inv['last_name']));
@@ -63,7 +64,7 @@ $block->setContent('room.subtotal', number_format($roomSubtotal, 2, ',', '.'));
 // Amenities aggiunti
 try {
     $stmtAm = db()->prepare('
-        SELECT a.name, ba.price, ba.quantity
+        SELECT a.name, a.price, ba.quantity
         FROM booking_amenities ba
         JOIN amenities a ON ba.amenity_id = a.id
         WHERE ba.booking_id = ?
@@ -76,7 +77,7 @@ try {
     }
 } catch (Exception $e) {}
 
-$block->setContent('invoice.grand_total', number_format((float)$inv['amount'], 2, ',', '.'));
+$block->setContent('invoice.grand_total', number_format((float)$inv['total_amount'], 2, ',', '.'));
 
 $page->setContent('body', $block->get());
 $page->close();

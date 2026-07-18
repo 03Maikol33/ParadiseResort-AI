@@ -94,8 +94,11 @@
                 <td><[staff_list.phone]></td>
                 <td><span class="badge <[staff_list.badge_color]>"><[staff_list.group_name]></span></td>
                 <td class="text-end pe-4">
-                  <a href="<[base]>/admin/staff.php?remove_role_user=<[staff_list.id]>&remove_role_group=<[staff_list.group_id]>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Vuoi rimuovere il ruolo di <[staff_list.group_name]> per questo utente?');" title="Rimuovi questo ruolo">
-                    <i class="bi bi-x-circle"></i>
+                  <a href="<[base]>/admin/staff.php?demote_user=<[staff_list.id]>" class="btn btn-sm btn-outline-warning me-1" onclick="return confirm('Vuoi retrocedere questo membro dello staff al ruolo di Ospite (Guest)?');" title="Retrocedi a Ospite (Guest)">
+                    <i class="bi bi-person-down"></i> Retrocedi a Guest
+                  </a>
+                  <a href="<[base]>/admin/staff.php?delete_user=<[staff_list.id]>" class="btn btn-sm btn-outline-danger" onclick="return confirm('ATTENZIONE: Vuoi eliminare definitivamente questo account dal sistema? Tutti i dati associati verranno rimossi.');" title="Elimina account definitivamente">
+                    <i class="bi bi-trash"></i> Elimina Account
                   </a>
                 </td>
               </tr>

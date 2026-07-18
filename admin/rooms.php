@@ -2,10 +2,7 @@
 require_once __DIR__ . '/../include/bootstrap.inc.php';
 
 require_login();
-if (!is_admin()) {
-    header('Location: ' . $config['base'] . '/login.php');
-    exit;
-}
+require_admin();
 
 $message = '';
 $error = '';
@@ -22,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     } else {
         try {
             if ($id > 0) {
-                $upd = db()->prepare('UPDATE rooms SET room_number = ?, room_category_id = ?, floor = ?, status = ? WHERE id = ?');
+                $upd = db()->prepare('UPDATE rooms SET room_number = ?, category_id = ?, floor = ?, status = ? WHERE id = ?');
                 $upd->execute([$roomNumber, $catId, $floor, $status, $id]);
                 $message = 'Camera fis. #' . $id . ' aggiornata con successo.';
             } else {
@@ -31,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 if ($chk->fetch()) {
                     $error = 'Esiste già una camera con questo numero (' . htmlspecialchars($roomNumber) . ').';
                 } else {
-                    $ins = db()->prepare('INSERT INTO rooms (room_number, room_category_id, floor, status) VALUES (?, ?, ?, ?)');
+                    $ins = db()->prepare('INSERT INTO rooms (room_number, category_id, floor, status) VALUES (?, ?, ?, ?)');
                     $ins->execute([$roomNumber, $catId, $floor, $status]);
                     $message = 'Nuova camera fisica (' . htmlspecialchars($roomNumber) . ') registrata nell\'inventario.';
                 }
@@ -70,7 +67,7 @@ try {
     $stmtRooms = db()->query('
         SELECT r.*, rc.name as category_name
         FROM rooms r
-        JOIN room_categories rc ON r.room_category_id = rc.id
+        JOIN room_categories rc ON r.category_id = rc.id
         ORDER BY r.floor ASC, r.room_number ASC
     ');
     $rooms = $stmtRooms->fetchAll();

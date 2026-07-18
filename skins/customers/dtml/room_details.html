@@ -60,6 +60,17 @@
                     <h4 class="font-weight-bold mb-3 text-center border-bottom pb-3">Prenota questa Camera</h4>
                     <p class="text-muted small text-center mb-4">Seleziona le date di check-in e check-out per verificare le camere disponibili e metterle in carrello</p>
 
+                    <[if!empty error]>
+                        <div class="alert alert-danger small p-3 mb-3 border-0 shadow-sm rounded">
+                            <i class="fas fa-exclamation-triangle me-1"></i> <[error]>
+                        </div>
+                    <[/if!empty]>
+                    <[if!empty message]>
+                        <div class="alert alert-success small p-3 mb-3 border-0 shadow-sm rounded">
+                            <i class="fas fa-check-circle me-1"></i> <[message]>
+                        </div>
+                    <[/if!empty]>
+
                     <form action="<[base]>/cart_add.php" method="POST">
                         <input type="hidden" name="room_category_id" value="<[room.id]>">
 

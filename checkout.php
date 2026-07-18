@@ -40,8 +40,8 @@ try {
     }
 
     $updBook = db()->prepare('UPDATE bookings SET status_id = ?, total_price = ? WHERE id = ?');
-    $insAmen = db()->prepare('INSERT INTO booking_amenities (booking_id, amenity_id, quantity, price) VALUES (?, ?, 1, ?)');
-    $insInv  = db()->prepare('INSERT INTO invoices (invoice_number, booking_id, amount, issued_date) VALUES (?, ?, ?, NOW())');
+    $insAmen = db()->prepare('INSERT INTO booking_amenities (booking_id, amenity_id, quantity) VALUES (?, ?, 1)');
+    $insInv  = db()->prepare('INSERT INTO invoices (booking_id, total_amount, invoice_date, payment_status) VALUES (?, ?, NOW(), \'paid\')');
 
     foreach ($items as $item) {
         $bookingId = (int)$item['id'];
@@ -50,7 +50,7 @@ try {
         // Aggiungiamo i servizi extra a ogni prenotazione del carrello
         foreach ($amRows as $am) {
             $amPrice = (float)$am['price'];
-            $insAmen->execute([$bookingId, (int)$am['id'], $amPrice]);
+            $insAmen->execute([$bookingId, (int)$am['id']]);
             $itemTotal += $amPrice;
         }
 
@@ -58,8 +58,7 @@ try {
         $updBook->execute([$newStatus, $itemTotal, $bookingId]);
 
         // Genera fattura
-        $invNum = 'INV-' . date('Y') . '-' . str_pad($bookingId, 5, '0', STR_PAD_LEFT);
-        $insInv->execute([$invNum, $bookingId, $itemTotal]);
+        $insInv->execute([$bookingId, $itemTotal]);
         $lastInvoiceId = (int)db()->lastInsertId();
     }
 

@@ -2,10 +2,7 @@
 require_once __DIR__ . '/../include/bootstrap.inc.php';
 
 require_login();
-if (!is_admin()) {
-    header('Location: ' . $config['base'] . '/login.php');
-    exit;
-}
+require_admin();
 
 $page = new_page('administration', 'frame-private');
 setup_backoffice_page($page, 'Amministratore', 'admin');
@@ -24,7 +21,7 @@ try {
         JOIN bookings b ON ba.booking_id = b.id
         JOIN users u ON b.user_id = u.id
         JOIN rooms r ON b.room_id = r.id
-        JOIN room_categories rc ON r.room_category_id = rc.id
+        JOIN room_categories rc ON r.category_id = rc.id
         WHERE b.status_id != 1
         ORDER BY b.check_in_date DESC
     ');

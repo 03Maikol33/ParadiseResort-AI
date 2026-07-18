@@ -2,10 +2,7 @@
 require_once __DIR__ . '/../include/bootstrap.inc.php';
 
 require_login();
-if (!is_receptionist()) {
-    header('Location: ' . $config['base'] . '/login.php');
-    exit;
-}
+require_service();
 
 $message = '';
 $error = '';
@@ -44,7 +41,7 @@ try {
     $sql = '
         SELECT r.*, rc.name as category_name, rc.capacity
         FROM rooms r
-        JOIN room_categories rc ON r.room_category_id = rc.id
+        JOIN room_categories rc ON r.category_id = rc.id
         WHERE 1=1
     ';
     $params = [];

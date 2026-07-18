@@ -81,10 +81,10 @@ $block->setContent('user.phone', htmlspecialchars($_SESSION['user']['phone'] ?? 
 // US-15: Storico prenotazioni (escluse quelle in carrello status_id = 1)
 try {
     $stmtBk = db()->prepare('
-        SELECT b.*, r.room_number, rc.name as category_name, rc.image_url, bs.name as status_name, i.id as invoice_id, i.invoice_number
+        SELECT b.*, r.room_number, rc.name as category_name, rc.image_url, bs.name as status_name, i.id as invoice_id
         FROM bookings b
         JOIN rooms r ON b.room_id = r.id
-        JOIN room_categories rc ON r.room_category_id = rc.id
+        JOIN room_categories rc ON r.category_id = rc.id
         JOIN booking_statuses bs ON b.status_id = bs.id
         LEFT JOIN invoices i ON b.id = i.booking_id
         WHERE b.user_id = ? AND b.status_id != 1

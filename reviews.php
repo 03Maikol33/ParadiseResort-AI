@@ -17,6 +17,9 @@ try {
     foreach ($reviews as $rev) {
         $block->setContent('review_list.id', (string)$rev['id']);
         $block->setContent('review_list.author', htmlspecialchars($rev['first_name'] . ' ' . substr($rev['last_name'], 0, 1) . '.'));
+        $initials = strtoupper(substr(trim($rev['first_name']), 0, 1) . substr(trim($rev['last_name']), 0, 1));
+        if ($initials === '') $initials = 'U';
+        $block->setContent('review_list.initials', htmlspecialchars($initials));
         $block->setContent('review_list.category_name', htmlspecialchars($rev['category_name'] ?? 'ParadiseResort General'));
         $block->setContent('review_list.date', date('d/m/Y', strtotime($rev['created_at'])));
         $block->setContent('review_list.comment', htmlspecialchars($rev['comment']));

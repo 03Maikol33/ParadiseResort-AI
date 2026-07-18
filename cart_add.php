@@ -31,8 +31,8 @@ try {
     $sqlAvail = '
         SELECT r.id, rc.base_price
         FROM rooms r
-        JOIN room_categories rc ON r.room_category_id = rc.id
-        WHERE r.room_category_id = :catId
+        JOIN room_categories rc ON r.category_id = rc.id
+        WHERE r.category_id = :catId
           AND r.status != \'Maintenance\'
           AND r.id NOT IN (
               SELECT b.room_id

@@ -52,6 +52,19 @@ function new_page(string $skinName, string $frame = 'frame-public'): Template {
     return $page;
 }
 
+function get_current_role_path(): string {
+    if (!empty($_SESSION['user']['role_path'])) {
+        return $_SESSION['user']['role_path'];
+    }
+    if (function_exists('is_admin') && is_admin()) {
+        return 'admin';
+    }
+    if (function_exists('is_receptionist') && is_receptionist()) {
+        return 'receptionist';
+    }
+    return 'receptionist';
+}
+
 /**
  * Crea un "blocco" di contenuto da inserire dentro un placeholder del frame.
  * Equiva a `new Skinlet($name)`, ma senza bug.
@@ -61,18 +74,24 @@ function new_block(string $template): Template {
     $skinName = $GLOBALS['current_skin'] ?? $GLOBALS['config']['skin'];
     $root = __DIR__ . '/..';
     $block = new Template("{$root}/skins/{$skinName}/dtml/{$template}");
-    $block->setContent('base', $GLOBALS['config']['base']);
+    $block->setContentOnce('base', $GLOBALS['config']['base']);
+    
+    $rolePath = get_current_role_path();
+    $block->setContentOnce('role_path', $rolePath);
+    $block->setContentOnce('is_admin_role', ($rolePath === 'admin') ? '1' : '');
+    $block->setContentOnce('is_receptionist_role', ($rolePath === 'receptionist') ? '1' : '');
+
     if (!empty($_SESSION['user']['id'])) {
-        $block->setContent('is_logged', '1');
+        $block->setContentOnce('is_logged', '1');
         $uName = $_SESSION['user']['name'] ?? trim(($_SESSION['user']['first_name'] ?? '') . ' ' . ($_SESSION['user']['last_name'] ?? ''));
-        $block->setContent('user_name', htmlspecialchars($uName));
+        $block->setContentOnce('user_name', htmlspecialchars($uName));
     } else {
-        $block->setContent('is_logged', '');
+        $block->setContentOnce('is_logged', '');
     }
     return $block;
 }
 
-function setup_backoffice_page(Template $page, string $roleName, string $rolePath): void {
+function setup_backoffice_page(Template $page, string $roleName, string $rolePath, ?Template $block = null): void {
     global $config;
 
     $_SESSION['user']['role_path'] = $rolePath;
@@ -88,13 +107,21 @@ function setup_backoffice_page(Template $page, string $roleName, string $rolePat
         $initials = 'U';
     }
 
-    $page->setContent('base', $config['base']);
-    $page->setContent('skin', 'administration');
-    $page->setContent('user_name', htmlspecialchars($name));
-    $page->setContent('user_role', $roleName);
-    $page->setContent('role_path', $rolePath);
-    $page->setContent('is_admin_role', ($rolePath === 'admin') ? '1' : '');
-    $page->setContent('user_initials', htmlspecialchars($initials));
+    $page->setContentOnce('base', $config['base']);
+    $page->setContentOnce('skin', 'administration');
+    $page->setContentOnce('user_name', htmlspecialchars($name));
+    $page->setContentOnce('user_role', $roleName);
+    $page->setContentOnce('role_path', $rolePath);
+    $page->setContentOnce('is_admin_role', ($rolePath === 'admin') ? '1' : '');
+    $page->setContentOnce('is_receptionist_role', ($rolePath === 'receptionist') ? '1' : '');
+    $page->setContentOnce('user_initials', htmlspecialchars($initials));
+
+    if ($block !== null) {
+        $block->setContentOnce('base', $config['base']);
+        $block->setContentOnce('role_path', $rolePath);
+        $block->setContentOnce('is_admin_role', ($rolePath === 'admin') ? '1' : '');
+        $block->setContentOnce('is_receptionist_role', ($rolePath === 'receptionist') ? '1' : '');
+    }
 
     // Notifiche
     $notif = get_backoffice_notifications_html();
@@ -121,7 +148,7 @@ function get_backoffice_notifications_html(): array {
             $count++;
             $timeStr = date('d/m H:i', strtotime($p['created_at']));
             $guest = htmlspecialchars($p['first_name'] . ' ' . $p['last_name']);
-            $url = $GLOBALS['config']['base'] . '/' . ($_SESSION['user']['role_path'] ?? 'receptionist') . '/bookings.php?status=2';
+            $url = $GLOBALS['config']['base'] . '/' . get_current_role_path() . '/bookings.php?status=2';
             $items[] = '
                 <a class="dropdown-item" href="' . $url . '">
                   <span class="notification-title text-wrap" style="white-space: normal;"><i class="bi bi-hourglass-split text-warning me-2"></i>Da confermare: #' . $p['id'] . '</span>
@@ -145,7 +172,7 @@ function get_backoffice_notifications_html(): array {
             $timeStr = date('d/m H:i', strtotime($t['created_at']));
             $desc = htmlspecialchars(mb_strimwidth($t['issue_description'], 0, 30, "..."));
             $roomLabel = $t['room_number'] ? 'Cam. ' . htmlspecialchars($t['room_number']) : 'Generica';
-            $urlTicket = $GLOBALS['config']['base'] . '/' . ($_SESSION['user']['role_path'] ?? 'receptionist') . '/segnalazioni.php';
+            $urlTicket = $GLOBALS['config']['base'] . '/' . get_current_role_path() . '/segnalazioni.php';
             $items[] = '
                 <a class="dropdown-item" href="' . $urlTicket . '">
                   <span class="notification-title text-wrap" style="white-space: normal;"><i class="bi bi-tools text-danger me-2"></i>Manutenzione ' . $roomLabel . '</span>
@@ -170,7 +197,7 @@ function get_backoffice_notifications_html(): array {
             $count++;
             $guest = htmlspecialchars($sa['first_name'] . ' ' . $sa['last_name']);
             $srvName = htmlspecialchars($sa['amenity_name']);
-            $url = $GLOBALS['config']['base'] . '/' . ($_SESSION['user']['role_path'] ?? 'receptionist') . '/bookings.php?search=' . $sa['booking_id'];
+            $url = $GLOBALS['config']['base'] . '/' . get_current_role_path() . '/bookings.php?search=' . $sa['booking_id'];
             $items[] = '
                 <a class="dropdown-item" href="' . $url . '">
                   <span class="notification-title text-wrap" style="white-space: normal; color: #dc3545;"><i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>Servizio Sospeso: ' . $srvName . '</span>
