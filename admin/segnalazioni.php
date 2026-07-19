@@ -70,7 +70,7 @@ try {
     $stmtRooms = db()->query('
         SELECT r.id, r.room_number, rc.name as category_name
         FROM rooms r
-        JOIN room_categories rc ON r.room_category_id = rc.id
+        JOIN room_categories rc ON r.category_id = rc.id
         ORDER BY r.room_number ASC
     ');
     $rooms = $stmtRooms->fetchAll();
@@ -84,8 +84,8 @@ try {
         SELECT mt.*, r.room_number, rc.name as category_name, u.first_name, u.last_name
         FROM maintenance_tickets mt
         JOIN rooms r ON mt.room_id = r.id
-        JOIN room_categories rc ON r.room_category_id = rc.id
-        LEFT JOIN users u ON mt.reported_by = u.id
+        JOIN room_categories rc ON r.category_id = rc.id
+        LEFT JOIN users u ON mt.reported_by_user_id = u.id
         ORDER BY mt.created_at DESC
     ');
     $tickets = $stmtTk->fetchAll();

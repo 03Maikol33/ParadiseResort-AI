@@ -66,6 +66,9 @@ function new_block(string $template): Template {
         $block->setContent('is_logged', '1');
         $uName = $_SESSION['user']['name'] ?? trim(($_SESSION['user']['first_name'] ?? '') . ' ' . ($_SESSION['user']['last_name'] ?? ''));
         $block->setContent('user_name', htmlspecialchars($uName));
+        if (!empty($_SESSION['user']['role_path'])) {
+            $block->setContent('role_path', $_SESSION['user']['role_path']);
+        }
     } else {
         $block->setContent('is_logged', '');
     }

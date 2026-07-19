@@ -110,7 +110,7 @@
                                 <div class="col-md-6 mb-3">
                                     <div class="custom-control custom-checkbox p-3 bg-white border rounded shadow-sm d-flex justify-content-between align-items-center">
                                         <div>
-                                            <input type="checkbox" class="custom-control-input" id="extra_<[extra_amenities.id]>" name="extras[<[extra_amenities.id]>]" value="1" style="width: 18px; height: 18px;">
+                                            <input type="checkbox" class="custom-control-input extra-checkbox" id="extra_<[extra_amenities.id]>" name="extras[<[extra_amenities.id]>]" value="1" data-price="<[extra_amenities.raw_price]>" <[extra_amenities.checked]> style="width: 18px; height: 18px;">
                                             <label class="custom-control-label font-weight-bold ml-2 text-dark" for="extra_<[extra_amenities.id]>"><[extra_amenities.name]></label>
                                             <small class="text-muted d-block ml-4"><[extra_amenities.description]></small>
                                         </div>
@@ -123,7 +123,7 @@
                     </div>
 
                     <!-- Right Column: Payment & Confirmation (US-16 & US-17) -->
-                    <div class="col-lg-4">
+                    <div class="col-lg-4" id="order-summary" data-rooms-total="<[raw_grand_total]>" data-num-rooms="<[num_rooms]>">
                         <div class="card shadow-lg border-0 rounded p-4 sticky-top" style="top: 100px; background: #fff;">
                             <h4 class="font-weight-bold mb-3 border-bottom pb-3 text-center">Riepilogo Ordine</h4>
                             
@@ -133,11 +133,11 @@
                             </div>
                             <div class="d-flex justify-content-between mb-3">
                                 <span class="text-muted">Servizi Extra</span>
-                                <span class="text-success small">Calcolati a fine ordine</span>
+                                <span id="extras-display" class="font-weight-bold text-success">€ 0,00</span>
                             </div>
                             <div class="d-flex justify-content-between border-top pt-3 mb-4">
                                 <span class="font-weight-bold fs-4">Totale da Pagare</span>
-                                <span class="text-primary font-weight-bold fs-3">€ <[grand_total]></span>
+                                <span id="grand-total-display" class="text-primary font-weight-bold fs-3">€ <[grand_total]></span>
                             </div>
 
                             <!-- Payment Selection (US-16) -->
@@ -171,6 +171,42 @@
                     </div>
                 </div>
             </form>
+
+            <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                var summaryEl = document.getElementById('order-summary');
+                if (!summaryEl) return;
+                
+                var roomsTotal = parseFloat(summaryEl.getAttribute('data-rooms-total')) || 0;
+                var checkboxes = document.querySelectorAll('.extra-checkbox');
+                var extrasDisplay = document.getElementById('extras-display');
+                var grandTotalDisplay = document.getElementById('grand-total-display');
+                
+                function updateSummary() {
+                    var extrasTotal = 0;
+                    checkboxes.forEach(function(cb) {
+                        if (cb.checked) {
+                            extrasTotal += parseFloat(cb.getAttribute('data-price')) || 0;
+                        }
+                    });
+                    
+                    var grandTotal = roomsTotal + extrasTotal;
+                    
+                    if (extrasDisplay) {
+                        extrasDisplay.textContent = '€ ' + extrasTotal.toFixed(2).replace('.', ',');
+                    }
+                    if (grandTotalDisplay) {
+                        grandTotalDisplay.textContent = '€ ' + grandTotal.toFixed(2).replace('.', ',');
+                    }
+                }
+                
+                checkboxes.forEach(function(cb) {
+                    cb.addEventListener('change', updateSummary);
+                });
+                
+                updateSummary();
+            });
+            </script>
         <[/if!empty]>
     </div>
 </section>

@@ -61,15 +61,16 @@ try {
         SELECT b.*, r.room_number, rc.name as category_name, rc.image_url, rc.base_price
         FROM bookings b
         JOIN rooms r ON b.room_id = r.id
-        JOIN room_categories rc ON r.room_category_id = rc.id
+        JOIN room_categories rc ON r.category_id = rc.id
         WHERE b.user_id = ? AND b.status_id = 1
         ORDER BY b.created_at DESC
     ');
     $stmtCart->execute([$userId]);
     $cartItems = $stmtCart->fetchAll();
 
-    $grandTotal = 0.0;
+    $roomsTotal = 0.0;
     $hasItems = !empty($cartItems);
+    $numRooms = count($cartItems);
 
     foreach ($cartItems as $item) {
         $block->setContent('cart_list.id', (string)$item['id']);
@@ -80,29 +81,49 @@ try {
         $chkIn = date('d/m/Y', strtotime($item['check_in_date']));
         $chkOut = date('d/m/Y', strtotime($item['check_out_date']));
         $days = max(1, (int)round((strtotime($item['check_out_date']) - strtotime($item['check_in_date'])) / 86400));
+        $roomCostOnly = $days * (float)$item['base_price'];
         
         $block->setContent('cart_list.dates', "$chkIn -> $chkOut ($days notti)");
-        $block->setContent('cart_list.price', number_format((float)$item['total_price'], 2, ',', '.'));
+        $block->setContent('cart_list.price', number_format($roomCostOnly, 2, ',', '.'));
         
         // Calcola tempo rimanente (30 min dalla creazione)
         $expireTimestamp = strtotime($item['created_at']) + (30 * 60);
         $diffMin = max(0, (int)round(($expireTimestamp - time()) / 60));
         $block->setContent('cart_list.expires_in', (string)$diffMin);
 
-        $grandTotal += (float)$item['total_price'];
+        $roomsTotal += $roomCostOnly;
     }
 
     $block->setContent('has_items', $hasItems ? '1' : '');
-    $block->setContent('grand_total', number_format($grandTotal, 2, ',', '.'));
+    $block->setContent('num_rooms', (string)$numRooms);
+    $block->setContent('grand_total', number_format($roomsTotal, 2, ',', '.'));
+    $block->setContent('raw_grand_total', (string)$roomsTotal);
+
+    // Trova tutti gli amenity_id già selezionati nei carrelli attivi dell'utente
+    $selectedAmenityIds = [];
+    if ($hasItems) {
+        $stmtSel = db()->prepare('
+            SELECT DISTINCT ba.amenity_id
+            FROM booking_amenities ba
+            JOIN bookings b ON ba.booking_id = b.id
+            WHERE b.user_id = ? AND b.status_id = 1
+        ');
+        $stmtSel->execute([$userId]);
+        $selectedAmenityIds = $stmtSel->fetchAll(PDO::FETCH_COLUMN);
+    }
 
     // Carica anche gli amenities acquistabili extra durante il checkout
-    $stmtAm = db()->query('SELECT * FROM amenities ORDER BY price ASC');
+    $stmtAm = db()->query('SELECT * FROM amenities WHERE is_suspended = 0 ORDER BY price ASC');
     $allAmen = $stmtAm->fetchAll();
     foreach ($allAmen as $am) {
         $block->setContent('extra_amenities.id', (string)$am['id']);
-        $block->setContent('extra_amenities.name', htmlspecialchars($am['name']));
+        $block->setContent('extra_amenities.name', htmlspecialchars(get_amenity_emoji($am['name']) . $am['name']));
         $block->setContent('extra_amenities.description', htmlspecialchars($am['description'] ?? ''));
         $block->setContent('extra_amenities.price', number_format((float)$am['price'], 2, ',', '.'));
+        $block->setContent('extra_amenities.raw_price', (string)$am['price']);
+        
+        $isChecked = in_array((int)$am['id'], $selectedAmenityIds);
+        $block->setContent('extra_amenities.checked', $isChecked ? 'checked' : '');
     }
 
 } catch (Exception $e) {

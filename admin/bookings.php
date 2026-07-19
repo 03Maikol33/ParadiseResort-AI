@@ -24,9 +24,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $upd->execute([$newStatus, $bkId]);
             $message = 'Stato della prenotazione #' . $bkId . ' aggiornato con successo.';
 
-            // Se completata (Check-out avvenuto), segna la camera fisica come Dirty
+            // Se completata (Check-out avvenuto), segna la camera fisica come cleaning (da pulire)
             if ($newStatus === 5 && !empty($bkRow['room_id'])) {
-                $updRoom = db()->prepare('UPDATE rooms SET status = \'Dirty\' WHERE id = ?');
+                $updRoom = db()->prepare('UPDATE rooms SET status = \'cleaning\' WHERE id = ?');
                 $updRoom->execute([$bkRow['room_id']]);
             }
         } catch (Exception $e) {
@@ -48,10 +48,10 @@ try {
     $stmt = db()->query('
         SELECT b.*, r.room_number, rc.name as category_name,
                u.first_name, u.last_name, u.email, u.phone,
-               bs.name as status_name, i.id as invoice_id, i.invoice_number
+               bs.name as status_name, i.id as invoice_id
         FROM bookings b
         JOIN rooms r ON b.room_id = r.id
-        JOIN room_categories rc ON r.room_category_id = rc.id
+        JOIN room_categories rc ON r.category_id = rc.id
         JOIN users u ON b.user_id = u.id
         JOIN booking_statuses bs ON b.status_id = bs.id
         LEFT JOIN invoices i ON b.id = i.booking_id

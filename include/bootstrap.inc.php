@@ -81,3 +81,16 @@ function get_cart_count(): int {
         return 0;
     }
 }
+
+function get_amenity_emoji(string $name): string {
+    if (stripos($name, 'SPA') !== false) {
+        return '🧖‍♀️ ';
+    }
+    if (stripos($name, 'Colazione') !== false) {
+        return '🥐 ';
+    }
+    if (stripos($name, 'Navetta') !== false) {
+        return '🚐 ';
+    }
+    return '⭐ ';
+}

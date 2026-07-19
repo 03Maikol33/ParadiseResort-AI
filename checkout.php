@@ -13,7 +13,13 @@ $paymentMethod = trim($_POST['payment_method'] ?? 'Resort');
 $extras = $_POST['extras'] ?? [];
 
 try {
-    $stmtCart = db()->prepare('SELECT * FROM bookings WHERE user_id = ? AND status_id = 1');
+    $stmtCart = db()->prepare('
+        SELECT b.*, rc.base_price
+        FROM bookings b
+        JOIN rooms r ON b.room_id = r.id
+        JOIN room_categories rc ON r.category_id = rc.id
+        WHERE b.user_id = ? AND b.status_id = 1
+    ');
     $stmtCart->execute([$userId]);
     $items = $stmtCart->fetchAll();
 
@@ -39,18 +45,25 @@ try {
         $amRows = [];
     }
 
+    // Cancella eventuali extra precedentemente inseriti nel carrello per evitare conflitti
+    $cartBookingIds = array_column($items, 'id');
+    $delPlaceholders = implode(',', array_fill(0, count($cartBookingIds), '?'));
+    $delAmen = db()->prepare("DELETE FROM booking_amenities WHERE booking_id IN ($delPlaceholders)");
+    $delAmen->execute($cartBookingIds);
+
     $updBook = db()->prepare('UPDATE bookings SET status_id = ?, total_price = ? WHERE id = ?');
-    $insAmen = db()->prepare('INSERT INTO booking_amenities (booking_id, amenity_id, quantity, price) VALUES (?, ?, 1, ?)');
-    $insInv  = db()->prepare('INSERT INTO invoices (invoice_number, booking_id, amount, issued_date) VALUES (?, ?, ?, NOW())');
+    $insAmen = db()->prepare('INSERT INTO booking_amenities (booking_id, amenity_id, quantity) VALUES (?, ?, 1)');
+    $insInv  = db()->prepare('INSERT INTO invoices (booking_id, total_amount) VALUES (?, ?)');
 
     foreach ($items as $item) {
         $bookingId = (int)$item['id'];
-        $itemTotal = (float)$item['total_price'];
+        $days = max(1, (int)round((strtotime($item['check_out_date']) - strtotime($item['check_in_date'])) / 86400));
+        $itemTotal = $days * (float)$item['base_price'];
 
         // Aggiungiamo i servizi extra a ogni prenotazione del carrello
         foreach ($amRows as $am) {
             $amPrice = (float)$am['price'];
-            $insAmen->execute([$bookingId, (int)$am['id'], $amPrice]);
+            $insAmen->execute([$bookingId, (int)$am['id']]);
             $itemTotal += $amPrice;
         }
 
@@ -58,8 +71,7 @@ try {
         $updBook->execute([$newStatus, $itemTotal, $bookingId]);
 
         // Genera fattura
-        $invNum = 'INV-' . date('Y') . '-' . str_pad($bookingId, 5, '0', STR_PAD_LEFT);
-        $insInv->execute([$invNum, $bookingId, $itemTotal]);
+        $insInv->execute([$bookingId, $itemTotal]);
         $lastInvoiceId = (int)db()->lastInsertId();
     }
 

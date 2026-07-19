@@ -44,7 +44,7 @@ try {
         SELECT DISTINCT r.id, r.room_number, rc.name as category_name
         FROM bookings b
         JOIN rooms r ON b.room_id = r.id
-        JOIN room_categories rc ON r.room_category_id = rc.id
+        JOIN room_categories rc ON r.category_id = rc.id
         WHERE b.user_id = ? AND b.status_id != 1
         ORDER BY r.room_number ASC
     ');

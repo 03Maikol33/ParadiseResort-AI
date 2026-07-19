@@ -58,6 +58,8 @@
             <div class="col-lg-4">
                 <div class="card shadow-lg border-0 rounded p-4 sticky-top" style="top: 100px; background: #fff;">
                     <h4 class="font-weight-bold mb-3 text-center border-bottom pb-3">Prenota questa Camera</h4>
+                    <[error]>
+                    <[message]>
                     <p class="text-muted small text-center mb-4">Seleziona le date di check-in e check-out per verificare le camere disponibili e metterle in carrello</p>
 
                     <form action="<[base]>/cart_add.php" method="POST">
@@ -65,12 +67,12 @@
 
                         <div class="form-group mb-3">
                             <label class="font-weight-bold small text-dark"><i class="far fa-calendar-alt text-primary me-1"></i> Data di Check-in *</label>
-                            <input type="date" name="check_in_date" class="form-control py-3" value="<[val_check_in]>" required>
+                            <input type="text" name="check_in_date" id="check_in_date" class="form-control py-3" value="<[val_check_in]>" placeholder="gg/mm/aaaa" required>
                         </div>
 
                         <div class="form-group mb-4">
                             <label class="font-weight-bold small text-dark"><i class="far fa-calendar-check text-primary me-1"></i> Data di Check-out *</label>
-                            <input type="date" name="check_out_date" class="form-control py-3" value="<[val_check_out]>" required>
+                            <input type="text" name="check_out_date" id="check_out_date" class="form-control py-3" value="<[val_check_out]>" placeholder="gg/mm/aaaa" required>
                         </div>
 
                         <div class="form-group mb-4">
@@ -85,8 +87,109 @@
                             </select>
                         </div>
 
+                        <!-- Servizi Extra checklist -->
+                        <div class="mb-4">
+                            <label class="font-weight-bold small text-dark"><i class="fas fa-gift text-primary me-1"></i> Servizi Extra (Facoltativi)</label>
+                            <[foreach]>
+                            <div class="custom-control custom-checkbox mb-2 p-2 border rounded bg-light d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <input type="checkbox" class="custom-control-input opt-service-checkbox" id="opt_extra_<[opt_amenity.id]>" name="extras[<[opt_amenity.id]>]" value="1" data-price="<[opt_amenity.raw_price]>" style="width: 18px; height: 18px; margin-top:0;">
+                                    <label class="custom-control-label small font-weight-bold ml-2 text-dark mb-0" for="opt_extra_<[opt_amenity.id]>"><[opt_amenity.name]></label>
+                                </div>
+                                <span class="badge badge-warning text-dark">+ € <[opt_amenity.price]> / gg</span>
+                            </div>
+                            <[/foreach]>
+                        </div>
+
+                        <!-- Live Price Calculation -->
+                        <div class="p-3 bg-light border rounded mb-4" id="live-price-box" style="display: none;">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted small">Prezzo Camera (<span id="live-nights">0</span> notti)</span>
+                                <span class="font-weight-bold small text-dark" id="live-room-cost">€ 0,00</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted small">Servizi Extra Selezionati</span>
+                                <span class="font-weight-bold small text-success" id="live-extras-cost">€ 0,00</span>
+                            </div>
+                            <div class="d-flex justify-content-between border-top pt-2 mt-2">
+                                <strong class="text-dark">Totale Stimato</strong>
+                                <strong class="text-primary fs-5" id="live-total-cost">€ 0,00</strong>
+                            </div>
+                        </div>
+
                         <button type="submit" class="btn btn1 w-100 py-3 font-weight-bold" style="font-size: 1.1rem;"><i class="fas fa-shopping-cart me-2"></i> Verifica & Aggiungi al Carrello</button>
                     </form>
+
+                    <script>
+                    document.addEventListener("DOMContentLoaded", function() {
+                        var basePrice = parseFloat("<[room.base_price]>".replace(/\./g, '').replace(',', '.')) || 0;
+                        
+                        var chkInInput = document.getElementById('check_in_date');
+                        var chkOutInput = document.getElementById('check_out_date');
+                        var livePriceBox = document.getElementById('live-price-box');
+                        var liveNights = document.getElementById('live-nights');
+                        var liveRoomCost = document.getElementById('live-room-cost');
+                        var liveExtrasCost = document.getElementById('live-extras-cost');
+                        var liveTotalCost = document.getElementById('live-total-cost');
+
+                        function parseDateDMY(str) {
+                            if (!str) return null;
+                            var parts = str.split('/');
+                            if (parts.length !== 3) return null;
+                            var day = parseInt(parts[0], 10);
+                            var month = parseInt(parts[1], 10) - 1;
+                            var year = parseInt(parts[2], 10);
+                            var d = new Date(year, month, day);
+                            if (isNaN(d.getTime())) return null;
+                            return d;
+                        }
+                        
+                        function updateLivePrice() {
+                            if (!chkInInput || !chkOutInput) return;
+                            var chkInStr = chkInInput.value;
+                            var chkOutStr = chkOutInput.value;
+                            
+                            var date1 = parseDateDMY(chkInStr);
+                            var date2 = parseDateDMY(chkOutStr);
+                            
+                            if (!date1 || !date2 || date2 <= date1) {
+                                if (livePriceBox) livePriceBox.style.display = 'none';
+                                return;
+                            }
+                            
+                            var timeDiff = date2.getTime() - date1.getTime();
+                            var nights = Math.max(1, Math.round(timeDiff / (1000 * 3600 * 24)));
+                            
+                            var roomCost = basePrice * nights;
+                            
+                            var extrasPerDay = 0;
+                            var checkedExtras = document.querySelectorAll('.opt-service-checkbox:checked');
+                            checkedExtras.forEach(function(cb) {
+                                extrasPerDay += parseFloat(cb.getAttribute('data-price')) || 0;
+                            });
+                            
+                            var extrasCost = extrasPerDay * nights;
+                            var totalCost = roomCost + extrasCost;
+                            
+                            if (liveNights) liveNights.textContent = nights;
+                            if (liveRoomCost) liveRoomCost.textContent = '€ ' + roomCost.toFixed(2).replace('.', ',');
+                            if (liveExtrasCost) liveExtrasCost.textContent = '€ ' + extrasCost.toFixed(2).replace('.', ',');
+                            if (liveTotalCost) liveTotalCost.textContent = '€ ' + totalCost.toFixed(2).replace('.', ',');
+                            
+                            if (livePriceBox) livePriceBox.style.display = 'block';
+                        }
+                        
+                        if (chkInInput) chkInInput.addEventListener('change', updateLivePrice);
+                        if (chkOutInput) chkOutInput.addEventListener('change', updateLivePrice);
+                        
+                        var extraCheckboxes = document.querySelectorAll('.opt-service-checkbox');
+                        extraCheckboxes.forEach(function(cb) {
+                            cb.addEventListener('change', updateLivePrice);
+                        });
+                        
+                        updateLivePrice();
+                    });
+                    </script>
 
                     <div class="text-center mt-4 pt-3 border-top">
                         <small class="text-muted"><i class="fas fa-shield-alt text-success me-1"></i> Nessun addebito immediato. Pagherai solo dopo la conferma al check-in.</small>
