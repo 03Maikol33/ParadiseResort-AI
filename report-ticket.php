@@ -23,8 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             if (!$chk->fetch()) {
                 $error = 'Stanza non valida per il tuo account.';
             } else {
-                $ins = db()->prepare('INSERT INTO maintenance_tickets (room_id, reported_by, issue_description, priority, status, created_at) VALUES (?, ?, ?, ?, \'Open\', NOW())');
-                $ins->execute([$roomId, $userId, $issue, $priority]);
+                $ins = db()->prepare('INSERT INTO maintenance_tickets (room_id, reported_by_user_id, status_id, issue_description, created_at) VALUES (?, ?, 1, ?, NOW())');
+                $ins->execute([$roomId, $userId, $issue]);
                 header('Location: ' . $config['base'] . '/report-ticket.php?success=1');
                 exit;
             }
@@ -36,10 +36,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
 $page = new_page('customers', 'frame-public');
 $block = new_block('report-ticket');
+
 $block->setContent('message', $message);
 $block->setContent('error', $error);
 
 try {
+    // Stanze per cui l'utente ha una prenotazione valida (US-14)
     $stmtRooms = db()->prepare('
         SELECT DISTINCT r.id, r.room_number, rc.name as category_name
         FROM bookings b
@@ -49,23 +51,24 @@ try {
         ORDER BY r.room_number ASC
     ');
     $stmtRooms->execute([$userId]);
-    $userRooms = $stmtRooms->fetchAll();
+    $myRooms = $stmtRooms->fetchAll();
 
-    $hasRooms = !empty($userRooms);
+    $hasRooms = !empty($myRooms);
     $block->setContent('has_rooms', $hasRooms ? '1' : '');
 
-    $options = '';
-    foreach ($userRooms as $ur) {
-        $options .= '<option value="' . $ur['id'] . '">Camera ' . htmlspecialchars($ur['room_number']) . ' (' . htmlspecialchars($ur['category_name']) . ')</option>';
+    $options = '<option value="0">-- Seleziona la Stanza interessata --</option>';
+    foreach ($myRooms as $rm) {
+        $options .= '<option value="' . $rm['id'] . '">Camera ' . htmlspecialchars($rm['room_number']) . ' (' . htmlspecialchars($rm['category_name']) . ')</option>';
     }
     $block->setContent('room_options', $options);
 
     // I miei ticket attivi
     $stmtMy = db()->prepare('
-        SELECT mt.*, r.room_number
+        SELECT mt.*, r.room_number, ts.name as status_name
         FROM maintenance_tickets mt
         JOIN rooms r ON mt.room_id = r.id
-        WHERE mt.reported_by = ?
+        JOIN ticket_statuses ts ON mt.status_id = ts.id
+        WHERE mt.reported_by_user_id = ?
         ORDER BY mt.created_at DESC
     ');
     $stmtMy->execute([$userId]);
@@ -81,9 +84,7 @@ try {
         $block->setContent('ticket_list.date', date('d/m/Y H:i', strtotime($tk['created_at'])));
         
         $prio = 'badge badge-info text-dark';
-        if ($tk['priority'] === 'High') $prio = 'badge badge-danger';
-        if ($tk['priority'] === 'Medium') $prio = 'badge badge-warning text-dark';
-        $block->setContent('ticket_list.priority_badge', '<span class="' . $prio . '">' . htmlspecialchars($tk['priority']) . '</span>');
+        $block->setContent('ticket_list.priority_badge', '<span class="' . $prio . '">Normale</span>');
     }
 } catch (Exception $e) {
     $block->setContent('has_rooms', '');

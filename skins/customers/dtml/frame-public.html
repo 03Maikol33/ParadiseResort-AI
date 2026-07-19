@@ -83,6 +83,19 @@
                                         </li>
                                         <li><a href="<[base]>/report-ticket.php">Assistenza Guasti</a></li>
                                         <li><a href="<[base]>/cart.php"><i class="fas fa-shopping-cart"></i> Carrello <[cart_badge]></a></li>
+                                        <li class="d-block d-lg-none">
+                                            <[ifempty is_logged]>
+                                                <a href="<[base]>/login.php" style="color: #d19f68; font-weight: bold;"><i class="fas fa-sign-in-alt me-1"></i> Accedi / Registrati</a>
+                                            <[/ifempty]>
+                                            <[if!empty is_logged]>
+                                                <a href="<[base]>/profile.php" style="color: #d19f68; font-weight: bold;"><i class="fas fa-user me-1"></i> Area Personale (<[user_name]>)</a>
+                                            <[/if!empty]>
+                                        </li>
+                                        <[if!empty is_logged]>
+                                        <li class="d-block d-lg-none">
+                                            <a href="<[base]>/logout.php" class="text-danger"><i class="fas fa-sign-out-alt me-1"></i> Esci</a>
+                                        </li>
+                                        <[/if!empty]>
                                     </ul>
                                 </nav>
                             </div>
@@ -106,7 +119,7 @@
                                     </div>
                                 <[/if!empty]>
                                 <[ifempty is_logged]>
-                                    <a href="<[base]>/login.php" class="btn btn1 d-none d-lg-block">Accedi / Registrati</a>
+                                    <a href="<[base]>/login.php" class="btn btn1">Accedi / Registrati</a>
                                 <[/ifempty]>
                             </div>
                         </div>

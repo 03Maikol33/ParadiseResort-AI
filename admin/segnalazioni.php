@@ -2,14 +2,18 @@
 require_once __DIR__ . '/../include/bootstrap.inc.php';
 
 require_login();
-if (!is_admin()) {
-    header('Location: ' . $config['base'] . '/login.php');
-    exit;
-}
+require_admin();
 
 $userId = (int)$_SESSION['user']['id'];
 $message = '';
 $error = '';
+
+if (isset($_GET['msg']) && $_GET['msg'] === 'opened') {
+    $message = 'Nuova segnalazione tecnica aperta con successo da Amministratore (Camera in Manutenzione).';
+} elseif (isset($_GET['msg']) && $_GET['msg'] === 'closed') {
+    $cId = (int)($_GET['id'] ?? 0);
+    $message = 'Ticket #' . $cId . ' chiuso e rimosso. Stanza ripristinata.';
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'save_ticket') {
     $roomId = (int)($_POST['room_id'] ?? 0);
@@ -20,15 +24,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $error = 'Seleziona una stanza e inserisci la descrizione del guasto.';
     } else {
         try {
-            $ins = db()->prepare('INSERT INTO maintenance_tickets (room_id, reported_by, issue_description, priority, status, created_at) VALUES (?, ?, ?, ?, \'Open\', NOW())');
-            $ins->execute([$roomId, $userId, $issue, $priority]);
+            $ins = db()->prepare('INSERT INTO maintenance_tickets (room_id, reported_by_user_id, status_id, issue_description, created_at) VALUES (?, ?, 1, ?, NOW())');
+            $ins->execute([$roomId, $userId, $issue]);
             
             if ($priority === 'High' || $priority === 'Medium') {
                 $updRoom = db()->prepare('UPDATE rooms SET status = \'Maintenance\' WHERE id = ?');
                 $updRoom->execute([$roomId]);
             }
 
-            $message = 'Nuova segnalazione tecnica aperta con successo da Amministratore (Camera in Manutenzione).';
+            header('Location: ' . $config['base'] . '/admin/segnalazioni.php?msg=opened');
+            exit;
         } catch (Exception $e) {
             $error = 'Errore apertura ticket: ' . $e->getMessage();
         }
@@ -52,17 +57,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 $updRoom->execute([$roomId]);
             }
         }
-
-        $message = 'Segnalazione guasto #' . $closeId . ' risolta e chiusa con successo da Admin (eliminata dal database).';
+        header('Location: ' . $config['base'] . '/admin/segnalazioni.php?msg=closed&id=' . $closeId);
+        exit;
     } catch (Exception $e) {
-        $error = 'Errore chiusura ticket: ' . $e->getMessage();
+        $error = 'Errore durante la chiusura del ticket.';
     }
 }
 
 $page = new_page('administration', 'frame-private');
-setup_backoffice_page($page, 'Amministratore', 'admin');
-
 $block = new_block('segnalazioni');
+setup_backoffice_page($page, 'Amministratore', 'admin', $block);
+
 $block->setContent('message', $message);
 $block->setContent('error', $error);
 
@@ -99,9 +104,7 @@ try {
         $block->setContent('tk_rows.author', $tk['first_name'] ? htmlspecialchars($tk['first_name'] . ' ' . $tk['last_name']) : 'Sistema / Guest');
         
         $prio = 'badge bg-info text-dark';
-        if ($tk['priority'] === 'High') $prio = 'badge bg-danger';
-        if ($tk['priority'] === 'Medium') $prio = 'badge bg-warning text-dark';
-        $block->setContent('tk_rows.priority_badge', '<span class="' . $prio . ' px-3 py-1">' . htmlspecialchars($tk['priority']) . '</span>');
+        $block->setContent('tk_rows.priority_badge', '<span class="' . $prio . ' px-3 py-1">Normale</span>');
     }
 } catch (Exception $e) {
     $block->setContent('error', 'Errore DB: ' . $e->getMessage());

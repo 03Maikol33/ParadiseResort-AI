@@ -89,10 +89,11 @@ function load_user_services(int $userId): array {
  * I servizi vengono caricati in sessione al login (login.php) e ricaricati in automatico se mancanti per auto-guarigione.
  */
 function has_service(string $service): bool {
-    if (!isset($_SESSION['user']['services'][$service]) && !empty($_SESSION['user']['id'])) {
+    if (!empty($_SESSION['user']['id'])) {
         $_SESSION['user']['services'] = load_user_services((int)$_SESSION['user']['id']);
+        return isset($_SESSION['user']['services'][$service]);
     }
-    return isset($_SESSION['user']['services'][$service]);
+    return false;
 }
 
 /*
@@ -102,20 +103,37 @@ function has_service(string $service): bool {
 function require_service(?string $service = null): void {
     require_login();
     $service = $service ?? basename($_SERVER['SCRIPT_NAME']);
+    
+    $scriptPath = $_SERVER['SCRIPT_NAME'] ?? '';
+    if (strpos($scriptPath, '/receptionist/') !== false) {
+        if (!is_admin() && !is_receptionist()) {
+            http_response_code(403);
+            die('Accesso negato: area riservata allo staff.');
+        }
+    }
+    if (strpos($scriptPath, '/admin/') !== false) {
+        if (!is_admin()) {
+            http_response_code(403);
+            die('Accesso negato: area riservata agli amministratori.');
+        }
+    }
+
     if (!has_service($service)) {
         http_response_code(403);
         die('Accesso negato: servizio non autorizzato.');
-
     }
 }
 
 /*
  * Gate delle pagine del backoffice. L'accesso è autorizzato tramite il
- * meccanismo dei Servizi: lo script corrente deve essere un servizio
- * assegnato a un gruppo dell'utente (nel seed tutti i servizi del backoffice
- * sono concessi al gruppo "admin").
+ * meccanismo dei Servizi e controllo del ruolo Amministratore.
  */
 function require_admin(): void {
+    require_login();
+    if (!is_admin()) {
+        http_response_code(403);
+        die('Accesso negato: area riservata agli amministratori.');
+    }
     require_service();
 }
 function block_admin(): void {

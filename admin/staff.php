@@ -2,13 +2,11 @@
 require_once __DIR__ . '/../include/bootstrap.inc.php';
 
 require_login();
-if (!is_admin()) {
-    header('Location: ' . $config['base'] . '/login.php');
-    exit;
-}
+require_admin();
 
-$message = '';
-$error = '';
+$message = $_SESSION['flash_message'] ?? '';
+$error   = $_SESSION['flash_error'] ?? '';
+unset($_SESSION['flash_message'], $_SESSION['flash_error']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'create_staff') {
     $firstName = trim($_POST['first_name'] ?? '');
@@ -19,11 +17,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $groupId   = (int)($_POST['group_id'] ?? 2); // default 2 (Receptionist)
 
     if ($firstName === '' || $lastName === '' || $email === '' || $password === '') {
-        $error = 'Nome, Cognome, Email e Password sono obbligatori.';
+        $_SESSION['flash_error'] = 'Nome, Cognome, Email e Password sono obbligatori.';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error = 'Formato email non valido.';
+        $_SESSION['flash_error'] = 'Formato email non valido.';
     } elseif (!in_array($groupId, [1, 2])) {
-        $error = 'Ruolo specificato non valido.';
+        $_SESSION['flash_error'] = 'Ruolo specificato non valido.';
     } else {
         try {
             $chk = db()->prepare('SELECT id FROM users WHERE email = ?');
@@ -31,11 +29,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $existing = $chk->fetch();
 
             if ($existing) {
-                // Se l'utente esiste già, assegniamo semplicemente il nuovo gruppo se non lo ha già
                 $userId = (int)$existing['id'];
                 $insGrp = db()->prepare('INSERT IGNORE INTO user_gruppi (user_id, group_id) VALUES (?, ?)');
                 $insGrp->execute([$userId, $groupId]);
-                $message = 'Ruolo assegnato con successo all\'utente esistente (' . htmlspecialchars($email) . ').';
+                $_SESSION['flash_message'] = 'Ruolo assegnato con successo all\'utente esistente (' . htmlspecialchars($email) . ').';
             } else {
                 $hashed = password_hash($password, PASSWORD_DEFAULT);
                 $ins = db()->prepare('INSERT INTO users (first_name, last_name, email, password, phone, created_at) VALUES (?, ?, ?, ?, ?, NOW())');
@@ -44,26 +41,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
                 $insGrp = db()->prepare('INSERT INTO user_gruppi (user_id, group_id) VALUES (?, ?)');
                 $insGrp->execute([$userId, $groupId]);
-                $message = 'Nuovo membro dello staff creato e assegnato al ruolo selezionato.';
+                $_SESSION['flash_message'] = 'Nuovo membro dello staff creato e assegnato al ruolo selezionato.';
             }
         } catch (Exception $e) {
-            $error = 'Errore durante la creazione dello staff: ' . $e->getMessage();
+            $_SESSION['flash_error'] = 'Errore durante la creazione dello staff: ' . $e->getMessage();
         }
     }
+    header('Location: ' . $config['base'] . '/admin/staff.php');
+    exit;
+} elseif (!empty($_GET['delete_user'])) {
+    $dUser = (int)$_GET['delete_user'];
+    if ($dUser === (int)$_SESSION['user']['id']) {
+        $_SESSION['flash_error'] = 'Impossibile eliminare il proprio profilo di Amministratore in uso.';
+    } else {
+        try {
+            // Controlla se è un admin e se si sta cercando di eliminarsi
+            $del = db()->prepare('DELETE FROM users WHERE id = ?');
+            $del->execute([$dUser]);
+            $_SESSION['flash_message'] = 'Account utente #' . $dUser . ' eliminato definitivamente dal sistema.';
+        } catch (Exception $e) {
+            $_SESSION['flash_error'] = 'Errore durante l\'eliminazione dell\'account.';
+        }
+    }
+    header('Location: ' . $config['base'] . '/admin/staff.php');
+    exit;
+} elseif (!empty($_GET['demote_user'])) {
+    $rUser = (int)$_GET['demote_user'];
+    if ($rUser === (int)$_SESSION['user']['id']) {
+        $_SESSION['flash_error'] = 'Impossibile retrocedere il proprio profilo di Amministratore in uso.';
+    } else {
+        try {
+            $delGrp = db()->prepare('DELETE FROM user_gruppi WHERE user_id = ? AND group_id IN (1, 2)');
+            $delGrp->execute([$rUser]);
+            
+            $insGuest = db()->prepare('INSERT IGNORE INTO user_gruppi (user_id, group_id) VALUES (?, 3)');
+            $insGuest->execute([$rUser]);
+
+            $_SESSION['flash_message'] = 'Utente #' . $rUser . ' retrocesso al ruolo di Ospite (Guest).';
+        } catch (Exception $e) {
+            $_SESSION['flash_error'] = 'Errore durante la retrocessione dell\'utente.';
+        }
+    }
+    header('Location: ' . $config['base'] . '/admin/staff.php');
+    exit;
 } elseif (!empty($_GET['remove_role_user']) && !empty($_GET['remove_role_group'])) {
     $rUser = (int)$_GET['remove_role_user'];
     $rGroup = (int)$_GET['remove_role_group'];
     if ($rUser === (int)$_SESSION['user']['id'] && $rGroup === 1) {
-        $error = 'Non puoi rimuovere il tuo stesso ruolo di Amministratore.';
+        $_SESSION['flash_error'] = 'Impossibile rimuovere il proprio ruolo di Amministratore.';
     } else {
         try {
             $delGrp = db()->prepare('DELETE FROM user_gruppi WHERE user_id = ? AND group_id = ?');
             $delGrp->execute([$rUser, $rGroup]);
-            $message = 'Ruolo rimosso con successo per l\'utente #' . $rUser . '.';
+            
+            $chkGrp = db()->prepare('SELECT COUNT(*) FROM user_gruppi WHERE user_id = ?');
+            $chkGrp->execute([$rUser]);
+            if ($chkGrp->fetchColumn() == 0) {
+                $insGuest = db()->prepare('INSERT INTO user_gruppi (user_id, group_id) VALUES (?, 3)');
+                $insGuest->execute([$rUser]);
+            }
+
+            $_SESSION['flash_message'] = 'Ruolo rimosso con successo per l\'utente #' . $rUser . '.';
         } catch (Exception $e) {
-            $error = 'Errore durante la rimozione del ruolo.';
+            $_SESSION['flash_error'] = 'Errore durante la rimozione del ruolo.';
         }
     }
+    header('Location: ' . $config['base'] . '/admin/staff.php');
+    exit;
 }
 
 $page = new_page('administration', 'frame-private');

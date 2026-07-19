@@ -41,6 +41,7 @@ $page = new_page('customers', 'frame-public');
 $block = new_block('invoice');
 
 $block->setContent('success', $success);
+$invNumber = 'INV-' . date('Y', strtotime($inv['invoice_date'])) . '-' . str_pad($inv['booking_id'], 5, '0', STR_PAD_LEFT);
 $block->setContent('invoice.id', (string)$inv['id']);
 $invNum = 'INV-' . date('Y', strtotime($inv['invoice_date'])) . '-' . str_pad($inv['id'], 5, '0', STR_PAD_LEFT);
 $block->setContent('invoice.number', $invNum);

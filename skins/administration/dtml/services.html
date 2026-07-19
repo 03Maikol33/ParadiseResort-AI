@@ -67,6 +67,7 @@
                   <th class="bg-danger bg-opacity-10 text-danger fw-bold" style="width: 130px;">Amministratore<br><small class="text-muted">(Grp 1)</small></th>
                   <th class="bg-primary bg-opacity-10 text-primary fw-bold" style="width: 130px;">Receptionist<br><small class="text-muted">(Grp 2)</small></th>
                   <th class="bg-info bg-opacity-10 text-dark fw-bold" style="width: 130px;">Ospite Guest<br><small class="text-muted">(Grp 3)</small></th>
+                  <th class="text-center" style="width: 60px;">Azioni</th>
                 </tr>
               </thead>
               <tbody>
@@ -78,7 +79,7 @@
                   
                   <!-- Amministratore (Group 1) -->
                   <td class="bg-light">
-                    <input class="form-check-input" type="checkbox" name="perm[1][<[service_rows.id]>]" value="1" <[service_rows.check_admin]> style="width: 20px; height: 20px; cursor: pointer;">
+                    <input class="form-check-input" type="checkbox" name="perm[1][<[service_rows.id]>]" value="1" checked disabled style="width: 20px; height: 20px; cursor: not-allowed;">
                   </td>
                   
                   <!-- Receptionist (Group 2) -->
@@ -89,6 +90,11 @@
                   <!-- Guest (Group 3) -->
                   <td class="bg-light">
                     <input class="form-check-input" type="checkbox" name="perm[3][<[service_rows.id]>]" value="1" <[service_rows.check_guest]> style="width: 20px; height: 20px; cursor: pointer;">
+                  </td>
+                  <td class="text-center">
+                    <a href="<[base]>/admin/services.php?del_service_id=<[service_rows.id]>" class="btn btn-sm btn-outline-danger" title="Elimina Servizio" onclick="return confirm('Sei sicuro di voler eliminare questo servizio dal database?');">
+                      <i class="bi bi-trash"></i>
+                    </a>
                   </td>
                 </tr>
                 <[/foreach]>

@@ -54,6 +54,7 @@ try {
     $updBook = db()->prepare('UPDATE bookings SET status_id = ?, total_price = ? WHERE id = ?');
     $insAmen = db()->prepare('INSERT INTO booking_amenities (booking_id, amenity_id, quantity) VALUES (?, ?, 1)');
     $insInv  = db()->prepare('INSERT INTO invoices (booking_id, total_amount) VALUES (?, ?)');
+    $insInv  = db()->prepare('INSERT INTO invoices (booking_id, total_amount, invoice_date, payment_status) VALUES (?, ?, NOW(), \'paid\')');
 
     foreach ($items as $item) {
         $bookingId = (int)$item['id'];

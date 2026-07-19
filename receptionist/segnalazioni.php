@@ -2,14 +2,15 @@
 require_once __DIR__ . '/../include/bootstrap.inc.php';
 
 require_login();
-if (!is_receptionist()) {
-    header('Location: ' . $config['base'] . '/login.php');
-    exit;
-}
+require_service();
 
 $userId = (int)$_SESSION['user']['id'];
 $message = '';
 $error = '';
+
+if (isset($_GET['msg']) && $_GET['msg'] === 'opened') {
+    $message = 'Nuova segnalazione tecnica aperta con successo dal Receptionist (Camera in Manutenzione).';
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'save_ticket') {
     $roomId = (int)($_POST['room_id'] ?? 0);
@@ -20,8 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $error = 'Seleziona una stanza e inserisci la descrizione del guasto.';
     } else {
         try {
-            $ins = db()->prepare('INSERT INTO maintenance_tickets (room_id, reported_by, issue_description, priority, status, created_at) VALUES (?, ?, ?, ?, \'Open\', NOW())');
-            $ins->execute([$roomId, $userId, $issue, $priority]);
+            $ins = db()->prepare('INSERT INTO maintenance_tickets (room_id, reported_by_user_id, status_id, issue_description, created_at) VALUES (?, ?, 1, ?, NOW())');
+            $ins->execute([$roomId, $userId, $issue]);
             
             // Imposta la camera in manutenzione se la priorità è alta o media
             if ($priority === 'High' || $priority === 'Medium') {
@@ -29,43 +30,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 $updRoom->execute([$roomId]);
             }
 
-            $message = 'Nuova segnalazione tecnica aperta con successo dal Receptionist (Camera in Manutenzione).';
+            header('Location: ' . $config['base'] . '/receptionist/segnalazioni.php?msg=opened');
+            exit;
         } catch (Exception $e) {
             $error = 'Errore apertura ticket: ' . $e->getMessage();
         }
     }
-} elseif (!empty($_GET['close_id'])) {
-    $closeId = (int)$_GET['close_id'];
-    try {
-        // Recupera la stanza collegata prima di eliminare
-        $get = db()->prepare('SELECT room_id FROM maintenance_tickets WHERE id = ?');
-        $get->execute([$closeId]);
-        $row = $get->fetch();
-        $roomId = $row ? (int)$row['room_id'] : 0;
-
-        $del = db()->prepare('DELETE FROM maintenance_tickets WHERE id = ?');
-        $del->execute([$closeId]);
-
-        if ($roomId > 0) {
-            // Se non ci sono altri ticket aperti per questa camera, rimettila Available
-            $chk = db()->prepare('SELECT id FROM maintenance_tickets WHERE room_id = ?');
-            $chk->execute([$roomId]);
-            if (!$chk->fetch()) {
-                $updRoom = db()->prepare('UPDATE rooms SET status = \'Available\' WHERE id = ?');
-                $updRoom->execute([$roomId]);
-            }
-        }
-
-        $message = 'Segnalazione guasto #' . $closeId . ' risolta e chiusa con successo (eliminata dal database come da specifiche).';
-    } catch (Exception $e) {
-        $error = 'Errore chiusura ticket: ' . $e->getMessage();
-    }
 }
 
 $page = new_page('administration', 'frame-private');
-setup_backoffice_page($page, 'Receptionist', 'receptionist');
-
 $block = new_block('segnalazioni');
+setup_backoffice_page($page, 'Receptionist', 'receptionist', $block);
+
 $block->setContent('message', $message);
 $block->setContent('error', $error);
 
@@ -104,9 +80,7 @@ try {
         $block->setContent('tk_rows.author', $tk['first_name'] ? htmlspecialchars($tk['first_name'] . ' ' . $tk['last_name']) : 'Sistema / Guest');
         
         $prio = 'badge bg-info text-dark';
-        if ($tk['priority'] === 'High') $prio = 'badge bg-danger';
-        if ($tk['priority'] === 'Medium') $prio = 'badge bg-warning text-dark';
-        $block->setContent('tk_rows.priority_badge', '<span class="' . $prio . ' px-3 py-1">' . htmlspecialchars($tk['priority']) . '</span>');
+        $block->setContent('tk_rows.priority_badge', '<span class="' . $prio . ' px-3 py-1">Normale</span>');
     }
 } catch (Exception $e) {
     $block->setContent('error', 'Errore DB: ' . $e->getMessage());
