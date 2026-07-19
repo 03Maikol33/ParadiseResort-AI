@@ -21,9 +21,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $upd->execute([$newStatus, $bkId]);
             $message = 'Stato della prenotazione #' . $bkId . ' aggiornato con successo dal Receptionist.';
 
-            // Se completata (Check-out avvenuto), segna la camera fisica come Dirty
+            // Se completata (Check-out avvenuto), segna la camera fisica come cleaning (da pulire)
             if ($newStatus === 5 && !empty($bkRow['room_id'])) {
-                $updRoom = db()->prepare('UPDATE rooms SET status = \'Dirty\' WHERE id = ?');
+                $updRoom = db()->prepare('UPDATE rooms SET status = \'cleaning\' WHERE id = ?');
                 $updRoom->execute([$bkRow['room_id']]);
             }
         } catch (Exception $e) {

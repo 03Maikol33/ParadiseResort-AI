@@ -19,8 +19,14 @@ try {
     exit;
 }
 
+$error = trim($_GET['error'] ?? '');
+$message = trim($_GET['message'] ?? '');
+
 $page = new_page('customers', 'frame-public');
 $block = new_block('room_details');
+
+$block->setContent('error', $error !== '' ? '<div class="alert alert-danger mb-4">' . htmlspecialchars($error) . '</div>' : '');
+$block->setContent('message', $message !== '' ? '<div class="alert alert-success mb-4">' . htmlspecialchars($message) . '</div>' : '');
 
 $block->setContent('room.id', (string)$cat['id']);
 $block->setContent('room.name', htmlspecialchars($cat['name']));
@@ -36,21 +42,18 @@ $block->setContent('val_check_out', htmlspecialchars($checkOut));
 
 // Servizi inclusi e facoltativi per la categoria
 try {
-    $stmtAmen = db()->prepare('
-        SELECT a.name, a.description, rca.is_included, rca.extra_price
-        FROM amenities a
-        JOIN room_category_amenities rca ON a.id = rca.amenity_id
-        WHERE rca.room_category_id = ?
-        ORDER BY rca.is_included DESC, a.name ASC
-    ');
-    $stmtAmen->execute([$categoryId]);
+    $stmtAmen = db()->query('SELECT * FROM amenities WHERE is_suspended = 0 ORDER BY price ASC');
     $amenities = $stmtAmen->fetchAll();
 
     foreach ($amenities as $am) {
-        $block->setContent('amenity_list.name', htmlspecialchars($am['name']));
+        $block->setContent('amenity_list.name', htmlspecialchars(get_amenity_emoji($am['name']) . $am['name']));
         $block->setContent('amenity_list.description', htmlspecialchars($am['description'] ?? ''));
-        $inc = (int)$am['is_included'] === 1;
-        $block->setContent('amenity_list.badge', $inc ? '<span class="badge badge-success">Incluso Gratis</span>' : '<span class="badge badge-warning text-dark">+ € ' . number_format((float)$am['extra_price'], 2, ',', '.') . ' / gg</span>');
+        $block->setContent('amenity_list.badge', '<span class="badge badge-warning text-dark">+ € ' . number_format((float)$am['price'], 2, ',', '.') . ' / gg</span>');
+        
+        $block->setContent('opt_amenity.id', (string)$am['id']);
+        $block->setContent('opt_amenity.name', htmlspecialchars(get_amenity_emoji($am['name']) . $am['name']));
+        $block->setContent('opt_amenity.price', number_format((float)$am['price'], 2, ',', '.'));
+        $block->setContent('opt_amenity.raw_price', (string)$am['price']);
     }
 } catch (Exception $e) {}
 

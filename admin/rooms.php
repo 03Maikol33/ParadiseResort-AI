@@ -4,8 +4,18 @@ require_once __DIR__ . '/../include/bootstrap.inc.php';
 require_login();
 require_admin();
 
-$message = '';
-$error = '';
+$statusMap = [
+    'Available' => 'available',
+    'Occupied' => 'occupied',
+    'Dirty' => 'cleaning',
+    'Maintenance' => 'maintenance'
+];
+$reverseMap = [
+    'available' => 'Available',
+    'occupied' => 'Occupied',
+    'cleaning' => 'Dirty',
+    'maintenance' => 'Maintenance'
+];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'save_room') {
     $id = (int)($_POST['id'] ?? 0);
@@ -18,9 +28,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $error = 'Numero Camera e Categoria sono obbligatori.';
     } else {
         try {
+            $dbStatus = $statusMap[$status] ?? 'available';
             if ($id > 0) {
                 $upd = db()->prepare('UPDATE rooms SET room_number = ?, category_id = ?, floor = ?, status = ? WHERE id = ?');
-                $upd->execute([$roomNumber, $catId, $floor, $status, $id]);
+                $upd->execute([$roomNumber, $catId, $floor, $dbStatus, $id]);
                 $message = 'Camera fis. #' . $id . ' aggiornata con successo.';
             } else {
                 $chk = db()->prepare('SELECT id FROM rooms WHERE room_number = ?');
@@ -29,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     $error = 'Esiste già una camera con questo numero (' . htmlspecialchars($roomNumber) . ').';
                 } else {
                     $ins = db()->prepare('INSERT INTO rooms (room_number, category_id, floor, status) VALUES (?, ?, ?, ?)');
-                    $ins->execute([$roomNumber, $catId, $floor, $status]);
+                    $ins->execute([$roomNumber, $catId, $floor, $dbStatus]);
                     $message = 'Nuova camera fisica (' . htmlspecialchars($roomNumber) . ') registrata nell\'inventario.';
                 }
             }
@@ -73,17 +84,20 @@ try {
     $rooms = $stmtRooms->fetchAll();
 
     foreach ($rooms as $r) {
+        $dbStatus = $r['status'];
+        $tmplStatus = $reverseMap[$dbStatus] ?? 'Available';
+
         $block->setContent('room_list.id', (string)$r['id']);
         $block->setContent('room_list.room_number', htmlspecialchars($r['room_number']));
         $block->setContent('room_list.category_name', htmlspecialchars($r['category_name']));
         $block->setContent('room_list.floor', (string)$r['floor']);
         
         $badge = 'badge bg-success';
-        if ($r['status'] === 'Maintenance') $badge = 'badge bg-warning text-dark';
-        if ($r['status'] === 'Occupied') $badge = 'badge bg-danger';
-        if ($r['status'] === 'Dirty') $badge = 'badge bg-secondary';
+        if ($tmplStatus === 'Maintenance') $badge = 'badge bg-warning text-dark';
+        if ($tmplStatus === 'Occupied') $badge = 'badge bg-danger';
+        if ($tmplStatus === 'Dirty') $badge = 'badge bg-secondary';
         
-        $block->setContent('room_list.status_badge', '<span class="' . $badge . '">' . htmlspecialchars($r['status']) . '</span>');
+        $block->setContent('room_list.status_badge', '<span class="' . $badge . '">' . htmlspecialchars($tmplStatus) . '</span>');
     }
 } catch (Exception $e) {
     $block->setContent('error', 'Errore DB: ' . $e->getMessage());

@@ -43,7 +43,8 @@ $block = new_block('invoice');
 $block->setContent('success', $success);
 $invNumber = 'INV-' . date('Y', strtotime($inv['invoice_date'])) . '-' . str_pad($inv['booking_id'], 5, '0', STR_PAD_LEFT);
 $block->setContent('invoice.id', (string)$inv['id']);
-$block->setContent('invoice.number', htmlspecialchars($invNumber));
+$invNum = 'INV-' . date('Y', strtotime($inv['invoice_date'])) . '-' . str_pad($inv['id'], 5, '0', STR_PAD_LEFT);
+$block->setContent('invoice.number', $invNum);
 $block->setContent('invoice.issued_date', date('d/m/Y H:i', strtotime($inv['invoice_date'])));
 $block->setContent('invoice.status_name', htmlspecialchars($inv['status_name']));
 
@@ -72,7 +73,7 @@ try {
     $stmtAm->execute([$inv['booking_id']]);
     $amenities = $stmtAm->fetchAll();
     foreach ($amenities as $am) {
-        $block->setContent('extras_list.name', htmlspecialchars($am['name']));
+        $block->setContent('extras_list.name', htmlspecialchars(get_amenity_emoji($am['name']) . $am['name']));
         $block->setContent('extras_list.price', number_format((float)$am['price'], 2, ',', '.'));
     }
 } catch (Exception $e) {}

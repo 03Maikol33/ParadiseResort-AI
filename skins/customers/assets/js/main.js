@@ -216,6 +216,23 @@
     $('#datepicker1').datepicker();
     $('#datepicker2').datepicker();
 
+    if ($('#check_in_date').length) {
+        $('#check_in_date').datepicker({
+            uiLibrary: 'bootstrap4',
+            format: 'dd/mm/yyyy'
+        }).on('change', function() {
+            this.dispatchEvent(new Event('change'));
+        });
+    }
+    if ($('#check_out_date').length) {
+        $('#check_out_date').datepicker({
+            uiLibrary: 'bootstrap4',
+            format: 'dd/mm/yyyy'
+        }).on('change', function() {
+            this.dispatchEvent(new Event('change'));
+        });
+    }
+
 
     
 // 11. ---- Mailchimp js --------//  

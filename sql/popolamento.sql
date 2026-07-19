@@ -79,9 +79,9 @@ INSERT INTO ticket_statuses (id, name) VALUES
 (3, 'Resolved');
 
 INSERT INTO amenities (id, name, description, price, image_url, is_suspended) VALUES
-(1, 'Accesso SPA', 'Ingresso giornaliero al centro benessere esclusivo con saune e percorso termale', 35.00, 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80', 0),
-(2, 'Colazione in Camera', 'Servizio premium in camera per la colazione continentale o all\'americana', 15.00, 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=800&q=80', 0),
-(3, 'Navetta Aeroporto', 'Trasferimento privato di lusso da e per l\'aeroporto', 50.00, 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=800&q=80', 0);
+(1, '🧖‍♀️ Accesso SPA', 'Ingresso giornaliero al centro benessere esclusivo con saune e percorso termale', 35.00, 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80', 0),
+(2, '🥐 Colazione in Camera', 'Servizio premium in camera per la colazione continentale o all\'americana', 15.00, 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=800&q=80', 0),
+(3, '🚐 Navetta Aeroporto', 'Trasferimento privato di lusso da e per l\'aeroporto', 50.00, 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=800&q=80', 0);
 
 INSERT INTO bookings (id, user_id, room_id, status_id, check_in_date, check_out_date, total_price, staff_notes) VALUES
 (1, 3, 3, 5, '2026-06-10', '2026-06-15', 600.00, 'Ospite regolare, richiesto cuscino aggiuntivo'),
@@ -106,3 +106,6 @@ INSERT INTO maintenance_tickets (room_id, reported_by_user_id, status_id, issue_
 INSERT INTO restaurant_reservations (user_id, reservation_date, meal_type, reservation_time, guests, status) VALUES
 (3, '2026-08-01', 'Cena', '20:30', 2, 'Confirmed'),
 (4, '2026-08-02', 'Pranzo', '13:00', 4, 'Pending');
+
+
+//prova commit

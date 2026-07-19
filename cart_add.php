@@ -59,7 +59,23 @@ try {
     $roomId = (int)$room['id'];
     $basePrice = (float)$room['base_price'];
     $days = max(1, (int)round((strtotime($checkOut) - strtotime($checkIn)) / 86400));
-    $totalPrice = $days * $basePrice;
+    
+    // Calcoliamo il costo degli extra selezionati
+    $extras = $_POST['extras'] ?? [];
+    $extrasPrice = 0.0;
+    $selectedExtras = [];
+    if (!empty($extras) && is_array($extras)) {
+        $ids = array_map('intval', array_keys($extras));
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $stmtEx = db()->prepare("SELECT id, price FROM amenities WHERE id IN ($placeholders)");
+        $stmtEx->execute($ids);
+        $selectedExtras = $stmtEx->fetchAll();
+        foreach ($selectedExtras as $ex) {
+            $extrasPrice += (float)$ex['price'];
+        }
+    }
+    
+    $totalPrice = ($days * $basePrice) + $extrasPrice;
 
     // US-13: Inserimento nel carrello (status_id = 1)
     $ins = db()->prepare('
@@ -73,6 +89,14 @@ try {
         $checkOut,
         $totalPrice
     ]);
+
+    $bookingId = (int)db()->lastInsertId();
+    if (!empty($selectedExtras)) {
+        $insAmen = db()->prepare('INSERT INTO booking_amenities (booking_id, amenity_id, quantity) VALUES (?, ?, 1)');
+        foreach ($selectedExtras as $ex) {
+            $insAmen->execute([$bookingId, (int)$ex['id']]);
+        }
+    }
 
     header('Location: ' . $config['base'] . '/cart.php?added=1');
     exit;

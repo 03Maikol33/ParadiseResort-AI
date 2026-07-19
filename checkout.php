@@ -13,7 +13,13 @@ $paymentMethod = trim($_POST['payment_method'] ?? 'Resort');
 $extras = $_POST['extras'] ?? [];
 
 try {
-    $stmtCart = db()->prepare('SELECT * FROM bookings WHERE user_id = ? AND status_id = 1');
+    $stmtCart = db()->prepare('
+        SELECT b.*, rc.base_price
+        FROM bookings b
+        JOIN rooms r ON b.room_id = r.id
+        JOIN room_categories rc ON r.category_id = rc.id
+        WHERE b.user_id = ? AND b.status_id = 1
+    ');
     $stmtCart->execute([$userId]);
     $items = $stmtCart->fetchAll();
 
@@ -39,13 +45,21 @@ try {
         $amRows = [];
     }
 
+    // Cancella eventuali extra precedentemente inseriti nel carrello per evitare conflitti
+    $cartBookingIds = array_column($items, 'id');
+    $delPlaceholders = implode(',', array_fill(0, count($cartBookingIds), '?'));
+    $delAmen = db()->prepare("DELETE FROM booking_amenities WHERE booking_id IN ($delPlaceholders)");
+    $delAmen->execute($cartBookingIds);
+
     $updBook = db()->prepare('UPDATE bookings SET status_id = ?, total_price = ? WHERE id = ?');
     $insAmen = db()->prepare('INSERT INTO booking_amenities (booking_id, amenity_id, quantity) VALUES (?, ?, 1)');
+    $insInv  = db()->prepare('INSERT INTO invoices (booking_id, total_amount) VALUES (?, ?)');
     $insInv  = db()->prepare('INSERT INTO invoices (booking_id, total_amount, invoice_date, payment_status) VALUES (?, ?, NOW(), \'paid\')');
 
     foreach ($items as $item) {
         $bookingId = (int)$item['id'];
-        $itemTotal = (float)$item['total_price'];
+        $days = max(1, (int)round((strtotime($item['check_out_date']) - strtotime($item['check_in_date'])) / 86400));
+        $itemTotal = $days * (float)$item['base_price'];
 
         // Aggiungiamo i servizi extra a ogni prenotazione del carrello
         foreach ($amRows as $am) {

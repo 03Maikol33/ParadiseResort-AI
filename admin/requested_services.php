@@ -11,7 +11,7 @@ $block = new_block('requested_services');
 
 try {
     $stmt = db()->query('
-        SELECT ba.id, ba.quantity, ba.price,
+        SELECT CONCAT(ba.booking_id, \'-\', ba.amenity_id) AS id, ba.quantity, a.price,
                a.name as amenity_name,
                b.id as booking_id, b.check_in_date, b.check_out_date,
                u.first_name, u.last_name, u.email, u.phone,
@@ -29,7 +29,7 @@ try {
 
     foreach ($requested as $req) {
         $block->setContent('req_rows.id', (string)$req['id']);
-        $block->setContent('req_rows.amenity_name', htmlspecialchars($req['amenity_name']));
+        $block->setContent('req_rows.amenity_name', htmlspecialchars(get_amenity_emoji($req['amenity_name']) . $req['amenity_name']));
         $block->setContent('req_rows.price', number_format((float)$req['price'], 2, ',', '.'));
         $block->setContent('req_rows.guest_name', htmlspecialchars($req['first_name'] . ' ' . $req['last_name']));
         $block->setContent('req_rows.guest_phone', htmlspecialchars($req['phone'] ?? '-'));
