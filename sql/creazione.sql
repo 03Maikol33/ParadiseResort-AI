@@ -55,7 +55,7 @@ CREATE TABLE rooms (
     room_number VARCHAR(10) UNIQUE NOT NULL,
     category_id INT NOT NULL,
     floor INT NOT NULL,
-    status ENUM('Available', 'Occupied', 'Dirty', 'Maintenance') DEFAULT 'Available',
+    status ENUM('Disponibile', 'Occupata', 'Da Pulire', 'In Manutenzione') DEFAULT 'Disponibile',
     FOREIGN KEY (category_id) REFERENCES room_categories(id) ON DELETE RESTRICT
 );
 

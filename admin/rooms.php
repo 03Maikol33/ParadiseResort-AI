@@ -4,31 +4,23 @@ require_once __DIR__ . '/../include/bootstrap.inc.php';
 require_login();
 require_admin();
 
-$statusMap = [
-    'Available' => 'available',
-    'Occupied' => 'occupied',
-    'Dirty' => 'cleaning',
-    'Maintenance' => 'maintenance'
-];
-$reverseMap = [
-    'available' => 'Available',
-    'occupied' => 'Occupied',
-    'cleaning' => 'Dirty',
-    'maintenance' => 'Maintenance'
-];
+$message = '';
+$error = '';
+
+// Maps removed since we use native Italian ENUMs
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'save_room') {
     $id = (int)($_POST['id'] ?? 0);
     $roomNumber = trim($_POST['room_number'] ?? '');
     $catId = (int)($_POST['room_category_id'] ?? 1);
     $floor = (int)($_POST['floor'] ?? 1);
-    $status = trim($_POST['status'] ?? 'Available');
+    $status = trim($_POST['status'] ?? 'Disponibile');
 
     if ($roomNumber === '' || $catId <= 0) {
         $error = 'Numero Camera e Categoria sono obbligatori.';
     } else {
         try {
-            $dbStatus = $statusMap[$status] ?? 'available';
+            $dbStatus = $status;
             if ($id > 0) {
                 $chk = db()->prepare('SELECT id FROM rooms WHERE room_number = ? AND id != ?');
                 $chk->execute([$roomNumber, $id]);
@@ -103,10 +95,10 @@ try {
     $block->setContent('filter_category_options', $filterCatOptions);
 
     $statuses = [
-        'Available' => 'Available (Disponibile / Pulita)',
-        'Occupied' => 'Occupied (Occupata dai Clienti)',
-        'Dirty' => 'Dirty (Da Pulire)',
-        'Maintenance' => 'Maintenance (In Manutenzione / Guasto)'
+        'Disponibile' => 'Disponibile (Pulita)',
+        'Occupata' => 'Occupata (Dai Clienti)',
+        'Da Pulire' => 'Da Pulire',
+        'In Manutenzione' => 'In Manutenzione'
     ];
     $statusOptions = '';
     $filterStatusOptions = '';
@@ -158,7 +150,6 @@ try {
 
     foreach ($rooms as $r) {
         $dbStatus = $r['status'];
-        $tmplStatus = $reverseMap[$dbStatus] ?? 'Available';
 
         $block->setContent('room_list.id', (string)$r['id']);
         $block->setContent('room_list.room_number', htmlspecialchars($r['room_number']));
@@ -166,11 +157,11 @@ try {
         $block->setContent('room_list.floor', (string)$r['floor']);
         
         $badge = 'badge bg-success';
-        if ($tmplStatus === 'Maintenance') $badge = 'badge bg-warning text-dark';
-        if ($tmplStatus === 'Occupied') $badge = 'badge bg-danger';
-        if ($tmplStatus === 'Dirty') $badge = 'badge bg-secondary';
+        if ($dbStatus === 'In Manutenzione') $badge = 'badge bg-warning text-dark';
+        if ($dbStatus === 'Occupata') $badge = 'badge bg-danger';
+        if ($dbStatus === 'Da Pulire') $badge = 'badge bg-secondary';
         
-        $block->setContent('room_list.status_badge', '<span class="' . $badge . '">' . htmlspecialchars($tmplStatus) . '</span>');
+        $block->setContent('room_list.status_badge', '<span class="' . $badge . '">' . htmlspecialchars($dbStatus) . '</span>');
     }
 } catch (Exception $e) {
     $block->setContent('error', 'Errore DB: ' . $e->getMessage());

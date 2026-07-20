@@ -7,30 +7,19 @@ require_service();
 $message = '';
 $error = '';
 
-$statusMap = [
-    'Available' => 'available',
-    'Occupied' => 'occupied',
-    'Dirty' => 'cleaning',
-    'Maintenance' => 'maintenance'
-];
-$reverseMap = [
-    'available' => 'Available',
-    'occupied' => 'Occupied',
-    'cleaning' => 'Dirty',
-    'maintenance' => 'Maintenance'
-];
+// Maps removed since we use native Italian ENUMs
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'change_room_status') {
     $roomId = (int)($_POST['room_id'] ?? 0);
-    $status = trim($_POST['status'] ?? 'Available');
+    $status = trim($_POST['status'] ?? 'Disponibile');
 
-    if ($roomId > 0 && in_array($status, ['Available', 'Occupied', 'Dirty'])) {
+    if ($roomId > 0 && in_array($status, ['Disponibile', 'Occupata', 'Da Pulire'])) {
         try {
             $chk = db()->prepare('SELECT status FROM rooms WHERE id = ?');
             $chk->execute([$roomId]);
             $currentStatus = $chk->fetchColumn();
             
-            if ($currentStatus === 'Maintenance') {
+            if ($currentStatus === 'In Manutenzione') {
                 $error = 'Questa camera è in manutenzione. Solo l\'amministratore può cambiarne lo stato.';
             } else {
                 $upd = db()->prepare('UPDATE rooms SET status = ? WHERE id = ?');
@@ -41,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $error = 'Errore durante l\'aggiornamento: ' . $e->getMessage();
         }
     } else {
-        if ($status === 'Maintenance') {
+        if ($status === 'In Manutenzione') {
             $error = 'Solo l\'amministratore può impostare una camera in manutenzione. Usa "Segnalazione Guasto".';
         }
     }
@@ -57,10 +46,10 @@ setup_backoffice_page($page, 'Receptionist', 'receptionist');
 $block = new_block('receptionist_rooms');
 $block->setContent('message', $message);
 $block->setContent('error', $error);
-$block->setContent('sel_avail', $filterStatus === 'Available' ? 'selected' : '');
-$block->setContent('sel_occ', $filterStatus === 'Occupied' ? 'selected' : '');
-$block->setContent('sel_dirty', $filterStatus === 'Dirty' ? 'selected' : '');
-$block->setContent('sel_maint', $filterStatus === 'Maintenance' ? 'selected' : '');
+$block->setContent('sel_avail', $filterStatus === 'Disponibile' ? 'selected' : '');
+$block->setContent('sel_occ', $filterStatus === 'Occupata' ? 'selected' : '');
+$block->setContent('sel_dirty', $filterStatus === 'Da Pulire' ? 'selected' : '');
+$block->setContent('sel_maint', $filterStatus === 'In Manutenzione' ? 'selected' : '');
 
 $stmtFloors = db()->query('SELECT DISTINCT floor FROM rooms ORDER BY floor ASC');
 $floors = $stmtFloors->fetchAll(PDO::FETCH_COLUMN);
@@ -90,9 +79,8 @@ try {
     $params = [];
 
     if ($filterStatus !== '') {
-        $dbFilterStatus = $statusMap[$filterStatus] ?? 'available';
         $sql .= ' AND r.status = :fStatus';
-        $params[':fStatus'] = $dbFilterStatus;
+        $params[':fStatus'] = $filterStatus;
     }
     if ($filterFloor !== '') {
         $sql .= ' AND r.floor = :fFloor';
@@ -116,12 +104,11 @@ try {
 
     foreach ($rooms as $rm) {
         $dbStatus = $rm['status'];
-        $tmplStatus = $reverseMap[$dbStatus] ?? 'Available';
 
-        if ($tmplStatus === 'Available') $cntAvail++;
-        if ($tmplStatus === 'Occupied') $cntOcc++;
-        if ($tmplStatus === 'Dirty') $cntDirty++;
-        if ($tmplStatus === 'Maintenance') $cntMaint++;
+        if ($dbStatus === 'Disponibile') $cntAvail++;
+        if ($dbStatus === 'Occupata') $cntOcc++;
+        if ($dbStatus === 'Da Pulire') $cntDirty++;
+        if ($dbStatus === 'In Manutenzione') $cntMaint++;
 
         $block->setContent('room_rows.id', (string)$rm['id']);
         $block->setContent('room_rows.number', htmlspecialchars($rm['room_number']));
@@ -130,23 +117,23 @@ try {
         $block->setContent('room_rows.capacity', (string)$rm['capacity']);
         
         $badge = 'badge bg-success';
-        if ($tmplStatus === 'Occupied') $badge = 'badge bg-danger';
-        if ($tmplStatus === 'Dirty') $badge = 'badge bg-secondary';
-        if ($tmplStatus === 'Maintenance') $badge = 'badge bg-warning text-dark';
-        $block->setContent('room_rows.status_badge', '<span class="' . $badge . ' px-3 py-2">' . htmlspecialchars($tmplStatus) . '</span>');
+        if ($dbStatus === 'Occupata') $badge = 'badge bg-danger';
+        if ($dbStatus === 'Da Pulire') $badge = 'badge bg-secondary';
+        if ($dbStatus === 'In Manutenzione') $badge = 'badge bg-warning text-dark';
+        $block->setContent('room_rows.status_badge', '<span class="' . $badge . ' px-3 py-2">' . htmlspecialchars($dbStatus) . '</span>');
 
-        if ($rm['status'] === 'Maintenance') {
+        if ($rm['status'] === 'In Manutenzione') {
             $block->setContent('room_rows.action_form', '<span class="text-danger small fw-bold">Solo admin</span>');
         } else {
-            $selAvail = $rm['status'] === 'Available' ? 'selected' : '';
-            $selDirty = $rm['status'] === 'Dirty' ? 'selected' : '';
-            $selOcc = $rm['status'] === 'Occupied' ? 'selected' : '';
+            $selAvail = $rm['status'] === 'Disponibile' ? 'selected' : '';
+            $selDirty = $rm['status'] === 'Da Pulire' ? 'selected' : '';
+            $selOcc = $rm['status'] === 'Occupata' ? 'selected' : '';
             
             $formHTML = '
                 <select name="status" class="form-select form-select-sm" style="width: 145px;">
-                  <option value="Available" '.$selAvail.'>Available (Pulita)</option>
-                  <option value="Dirty" '.$selDirty.'>Dirty (Da Pulire)</option>
-                  <option value="Occupied" '.$selOcc.'>Occupied (Occupata)</option>
+                  <option value="Disponibile" '.$selAvail.'>Disponibile (Pulita)</option>
+                  <option value="Da Pulire" '.$selDirty.'>Da Pulire</option>
+                  <option value="Occupata" '.$selOcc.'>Occupata</option>
                 </select>
                 <button type="submit" class="btn btn-sm btn-primary" title="Aggiorna"><i class="bi bi-check2"></i></button>
             ';
