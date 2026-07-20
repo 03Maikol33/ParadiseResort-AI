@@ -50,16 +50,32 @@ $block = new_block('categories');
 $block->setContent('message', $message);
 $block->setContent('error', $error);
 
+$editCat = null;
+if (!empty($_GET['edit_id'])) {
+    $stmt = db()->prepare('SELECT * FROM room_categories WHERE id = ?');
+    $stmt->execute([(int)$_GET['edit_id']]);
+    $editCat = $stmt->fetch();
+}
+
+$block->setContent('form_id', $editCat ? (string)$editCat['id'] : '');
+$block->setContent('form_name', $editCat ? htmlspecialchars($editCat['name']) : '');
+$block->setContent('form_description', $editCat ? htmlspecialchars($editCat['description']) : '');
+$block->setContent('form_base_price', $editCat ? (string)$editCat['base_price'] : '');
+$block->setContent('form_capacity', $editCat ? (string)$editCat['capacity'] : '');
+$block->setContent('form_image_url', $editCat ? htmlspecialchars($editCat['image_url']) : 'deluxe_singola.jpg');
+$block->setContent('form_title', $editCat ? 'Modifica Categoria #' . $editCat['id'] : 'Nuova Categoria');
+$block->setContent('btn_label', $editCat ? 'Salva Modifiche' : 'Salva Categoria');
+
 try {
     $stmtCat = db()->query('SELECT * FROM room_categories ORDER BY id ASC');
     $categories = $stmtCat->fetchAll();
-    foreach ($categories as $cat) {
-        $block->setContent('cat_list.id', (string)$cat['id']);
-        $block->setContent('cat_list.name', htmlspecialchars($cat['name']));
-        $block->setContent('cat_list.description', htmlspecialchars(substr($cat['description'] ?? '', 0, 90) . '...'));
-        $block->setContent('cat_list.base_price', number_format((float)$cat['base_price'], 2, ',', '.'));
-        $block->setContent('cat_list.capacity', (string)$cat['capacity']);
-        $block->setContent('cat_list.image_url', htmlspecialchars($cat['image_url'] ?? 'deluxe_singola.jpg'));
+    foreach ($categories as $c) {
+        $block->setContent('cat_list.id', (string)$c['id']);
+        $block->setContent('cat_list.name', htmlspecialchars($c['name']));
+        $block->setContent('cat_list.description', htmlspecialchars(mb_strimwidth($c['description'] ?? '', 0, 50, "...")));
+        $block->setContent('cat_list.capacity', (string)$c['capacity']);
+        $block->setContent('cat_list.base_price', number_format((float)$c['base_price'], 2, ',', '.'));
+        $block->setContent('cat_list.image_url', htmlspecialchars($c['image_url'] ?? 'deluxe_singola.jpg'));
     }
 } catch (Exception $e) {
     $block->setContent('error', 'Errore DB: ' . $e->getMessage());

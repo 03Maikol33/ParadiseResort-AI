@@ -514,7 +514,8 @@ Class Template {
 				if($result){
 
 					$placeholderName = $token2[1];
-					$parsedContent = $this->transformContent($placeholderName,NULL,$buffer);
+                    $data = isset($this->content[$placeholderName]) ? $this->content[$placeholderName] : NULL;
+					$parsedContent = $this->transformContent($placeholderName,$data,$buffer);
 
 					if (is_array($parsedContent)) {
 						foreach($parsedContent as $currentParsedContentName=>$currentParsedContentValue){
@@ -527,7 +528,7 @@ Class Template {
 			for($i=0;$i<count($finalContent[0]);$i++){
 				$currentParsedContentName = $finalContent[0][$i];
 				$currentParsedContentValue = $finalContent[1][$i];
-				$buffer = preg_replace("~{$this->escaped_tags['open']}$currentParsedContentName{$this->escaped_tags['close']}~Us",$currentParsedContentValue,$buffer,1);
+				$buffer = preg_replace("~{$this->escaped_tags['open']}$currentParsedContentName{$this->escaped_tags['close']}~Us",$currentParsedContentValue,$buffer,-1);
 			}
 		}
 

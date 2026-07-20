@@ -27,45 +27,56 @@
 <[/if!empty]>
 
 <div class="row g-4">
-  <div class="col-lg-4">
-    <div class="card shadow-sm border-0 rounded">
-      <div class="card-header bg-dark text-white py-3">
-        <h6 class="mb-0 fw-bold"><i class="bi bi-plus-circle me-2"></i> Nuova Categoria</h6>
-      </div>
-      <div class="card-body p-4">
-        <form action="<[base]>/admin/categories.php" method="POST">
-          <input type="hidden" name="action" value="save_category">
-          
-          <div class="mb-3">
-            <label class="form-label fw-bold small">Nome Categoria *</label>
-            <input type="text" name="name" class="form-control" placeholder="es. Deluxe Singola" required>
+  <div class="col-12">
+    <div class="accordion shadow-sm" id="accordionForm">
+      <div class="accordion-item border-0 rounded">
+        <h2 class="accordion-header">
+          <button class="accordion-button <[if empty form_id]>collapsed<[/if empty]> bg-dark text-white fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseForm" style="color: white !important;">
+            <i class="bi bi-plus-circle me-2"></i> <[form_title]>
+          </button>
+        </h2>
+        <div id="collapseForm" class="accordion-collapse collapse <[if!empty form_id]>show<[/if!empty]>" data-bs-parent="#accordionForm">
+          <div class="accordion-body p-4 bg-white">
+            <form action="<[base]>/admin/categories.php" method="POST" class="row g-3">
+              <input type="hidden" name="action" value="save_category">
+              <input type="hidden" name="id" value="<[form_id]>">
+              
+              <div class="col-md-4">
+                <label class="form-label fw-bold small">Nome Categoria *</label>
+                <input type="text" name="name" class="form-control" placeholder="es. Deluxe Singola" value="<[form_name]>" required>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label fw-bold small">Prezzo Base (€) *</label>
+                <input type="number" step="0.01" name="base_price" class="form-control" placeholder="150.00" value="<[form_base_price]>" required>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label fw-bold small">Capienza (Ospiti) *</label>
+                <input type="number" name="capacity" class="form-control" placeholder="2" value="<[form_capacity]>" required>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-bold small">File Immagine</label>
+                <input type="text" name="image_url" class="form-control" value="<[form_image_url]>">
+              </div>
+              
+              <div class="col-md-12">
+                <label class="form-label fw-bold small">Descrizione Commerciale</label>
+                <textarea name="description" class="form-control" rows="2" placeholder="Comfort esclusivo con vista giardino..."><[form_description]></textarea>
+              </div>
+              
+              <div class="col-12 d-flex gap-2 justify-content-end mt-4">
+                <[if!empty form_id]>
+                  <a href="<[base]>/admin/categories.php" class="btn btn-outline-secondary fw-bold px-4">Annulla</a>
+                <[/if!empty]>
+                <button type="submit" class="btn btn-dark fw-bold px-5"><i class="bi bi-save me-2"></i> <[btn_label]></button>
+              </div>
+            </form>
           </div>
-          <div class="mb-3">
-            <label class="form-label fw-bold small">Descrizione Commerciale</label>
-            <textarea name="description" class="form-control" rows="4" placeholder="Comfort esclusivo con vista giardino..."></textarea>
-          </div>
-          <div class="row">
-            <div class="col-6 mb-3">
-              <label class="form-label fw-bold small">Prezzo Base (€) *</label>
-              <input type="number" step="0.01" name="base_price" class="form-control" placeholder="150.00" required>
-            </div>
-            <div class="col-6 mb-3">
-              <label class="form-label fw-bold small">Capienza (Ospiti) *</label>
-              <input type="number" name="capacity" class="form-control" placeholder="2" required>
-            </div>
-          </div>
-          <div class="mb-4">
-            <label class="form-label fw-bold small">File Immagine</label>
-            <input type="text" name="image_url" class="form-control" value="deluxe_singola.jpg">
-          </div>
-          
-          <button type="submit" class="btn btn-dark w-100 fw-bold py-2"><i class="bi bi-save me-2"></i> Salva Categoria</button>
-        </form>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="col-lg-8">
+  <div class="col-12">
     <div class="card shadow-sm border-0 rounded">
       <div class="card-header bg-white py-3">
         <h6 class="mb-0 fw-bold"><i class="bi bi-list-stars me-2 text-primary"></i>Catalogo Attivo nel Resort</h6>
@@ -96,6 +107,9 @@
                 <td class="fw-bold text-success">€ <[cat_list.base_price]></td>
                 <td class="small text-muted" style="max-width: 220px;"><[cat_list.description]></td>
                 <td class="text-end pe-4">
+                  <a href="<[base]>/admin/categories.php?edit_id=<[cat_list.id]>" class="btn btn-sm btn-outline-primary me-1" title="Modifica Categoria">
+                    <i class="bi bi-pencil"></i>
+                  </a>
                   <a href="<[base]>/admin/categories.php?del_id=<[cat_list.id]>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Sicuro di voler eliminare questa categoria?');" title="Elimina Categoria">
                     <i class="bi bi-trash"></i>
                   </a>

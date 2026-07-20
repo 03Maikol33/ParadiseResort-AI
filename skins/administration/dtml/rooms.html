@@ -30,15 +30,16 @@
   <div class="col-lg-4">
     <div class="card shadow-sm border-0 rounded">
       <div class="card-header bg-dark text-white py-3">
-        <h6 class="mb-0 fw-bold"><i class="bi bi-door-open me-2"></i> Registra Nuova Camera</h6>
+        <h6 class="mb-0 fw-bold"><i class="bi bi-door-open me-2"></i> <[form_title]></h6>
       </div>
       <div class="card-body p-4">
         <form action="<[base]>/admin/rooms.php" method="POST">
           <input type="hidden" name="action" value="save_room">
+          <input type="hidden" name="id" value="<[form_room_id]>">
           
           <div class="mb-3">
             <label class="form-label fw-bold small">Numero o Sigla Stanza *</label>
-            <input type="text" name="room_number" class="form-control" placeholder="es. 101 o Suite Imperiale" required>
+            <input type="text" name="room_number" class="form-control" placeholder="es. 101 o Suite Imperiale" value="<[edit_room_number]>" required>
           </div>
           <div class="mb-3">
             <label class="form-label fw-bold small">Categoria Commerciale *</label>
@@ -48,19 +49,19 @@
           </div>
           <div class="mb-3">
             <label class="form-label fw-bold small">Piano *</label>
-            <input type="number" name="floor" class="form-control" value="1" required>
+            <input type="number" name="floor" class="form-control" value="<[edit_floor]>" required>
           </div>
           <div class="mb-4">
             <label class="form-label fw-bold small">Stato Operativo Attuale *</label>
             <select name="status" class="form-select" required>
-              <option value="Available">Available (Disponibile / Pulita)</option>
-              <option value="Occupied">Occupied (Occupata dai Clienti)</option>
-              <option value="Dirty">Dirty (Da Pulire)</option>
-              <option value="Maintenance">Maintenance (In Manutenzione / Guasto)</option>
+              <[status_options]>
             </select>
           </div>
           
-          <button type="submit" class="btn btn-dark w-100 fw-bold py-2"><i class="bi bi-save me-2"></i> Registra Stanza</button>
+          <button type="submit" class="btn btn-dark w-100 fw-bold py-2 mb-2"><i class="bi bi-save me-2"></i> <[btn_label]></button>
+          <[if!empty edit_id]>
+            <a href="<[base]>/admin/rooms.php" class="btn btn-outline-secondary w-100">Annulla</a>
+          <[/if!empty]>
         </form>
       </div>
     </div>
@@ -70,6 +71,32 @@
     <div class="card shadow-sm border-0 rounded">
       <div class="card-header bg-white py-3">
         <h6 class="mb-0 fw-bold"><i class="bi bi-grid-fill me-2 text-primary"></i>Inventario Fisico Camere</h6>
+      </div>
+      <div class="card-body border-bottom p-3 bg-light">
+        <form action="<[base]>/admin/rooms.php" method="GET" class="row g-2 align-items-center">
+          <div class="col-auto">
+            <select name="filter_cat" class="form-select form-select-sm">
+              <option value="">Tutte le Categorie</option>
+              <[filter_category_options]>
+            </select>
+          </div>
+          <div class="col-auto">
+            <select name="filter_floor" class="form-select form-select-sm">
+              <option value="">Tutti i Piani</option>
+              <[filter_floor_options]>
+            </select>
+          </div>
+          <div class="col-auto">
+            <select name="filter_status" class="form-select form-select-sm">
+              <option value="">Tutti gli Stati</option>
+              <[filter_status_options]>
+            </select>
+          </div>
+          <div class="col-auto">
+            <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-funnel"></i> Filtra</button>
+            <a href="<[base]>/admin/rooms.php" class="btn btn-sm btn-outline-secondary">Reset</a>
+          </div>
+        </form>
       </div>
       <div class="card-body p-0">
         <div class="table-responsive">
@@ -93,6 +120,9 @@
                 <td class="fw-bold text-dark"><[room_list.category_name]></td>
                 <td><[room_list.status_badge]></td>
                 <td class="text-end pe-4">
+                  <a href="<[base]>/admin/rooms.php?edit_id=<[room_list.id]>" class="btn btn-sm btn-outline-primary me-1" title="Modifica Camera">
+                    <i class="bi bi-pencil"></i>
+                  </a>
                   <a href="<[base]>/admin/rooms.php?del_id=<[room_list.id]>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Sicuro di voler eliminare questa camera fisica (#<[room_list.id]>)?');" title="Elimina Camera">
                     <i class="bi bi-trash"></i>
                   </a>
