@@ -13,6 +13,10 @@ try {
         $block->setContent('amenity_list.name', htmlspecialchars($am['name']));
         $block->setContent('amenity_list.description', htmlspecialchars($am['description'] ?? ''));
         $block->setContent('amenity_list.price', number_format((float)$am['price'], 2, ',', '.'));
+        $localImage = 'spa.jpg';
+        if (stripos($am['name'], 'Colazione') !== false) $localImage = 'colazione.jpg';
+        if (stripos($am['name'], 'Navetta') !== false) $localImage = 'navetta.jpg';
+        $block->setContent('amenity_list.image_url', $localImage);
     }
 } catch (Exception $e) {
     // Gestione errore
