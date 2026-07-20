@@ -13,6 +13,9 @@ if (empty($_SESSION['user']['id'])) {
 $catId = (int)($_POST['room_category_id'] ?? 0);
 $checkIn = trim($_POST['check_in_date'] ?? '');
 $checkOut = trim($_POST['check_out_date'] ?? '');
+
+$checkInDb = preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $checkIn) ? DateTime::createFromFormat('d/m/Y', $checkIn)->format('Y-m-d') : $checkIn;
+$checkOutDb = preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $checkOut) ? DateTime::createFromFormat('d/m/Y', $checkOut)->format('Y-m-d') : $checkOut;
 $guestsCount = (int)($_POST['guests_count'] ?? 2);
 
 if ($catId <= 0 || $checkIn === '' || $checkOut === '') {
@@ -21,7 +24,7 @@ if ($catId <= 0 || $checkIn === '' || $checkOut === '') {
 }
 
 $today = date('Y-m-d');
-if ($checkIn < $today || $checkOut <= $checkIn) {
+if ($checkInDb < $today || $checkOutDb <= $checkInDb) {
     header('Location: ' . $config['base'] . '/room_details.php?id=' . $catId . '&error=' . urlencode('Date di Check-In e Check-Out non valide. Check-Out deve essere successivo al Check-In.'));
     exit;
 }
@@ -45,20 +48,20 @@ try {
     $stmt = db()->prepare($sqlAvail);
     $stmt->execute([
         ':catId' => $catId,
-        ':checkIn' => $checkIn,
-        ':checkOut' => $checkOut
+        ':checkIn' => $checkInDb,
+        ':checkOut' => $checkOutDb
     ]);
     $room = $stmt->fetch();
 
     if (!$room) {
-        $msg = 'Spiacenti, non ci sono camere di questa categoria disponibili dal ' . date('d/m/Y', strtotime($checkIn)) . ' al ' . date('d/m/Y', strtotime($checkOut)) . '. Seleziona altre date o un\'altra categoria.';
+        $msg = 'Spiacenti, non ci sono camere di questa categoria disponibili dal ' . $checkIn . ' al ' . $checkOut . '. Seleziona altre date o un\'altra categoria.';
         header('Location: ' . $config['base'] . '/room_details.php?id=' . $catId . '&error=' . urlencode($msg));
         exit;
     }
 
     $roomId = (int)$room['id'];
     $basePrice = (float)$room['base_price'];
-    $days = max(1, (int)round((strtotime($checkOut) - strtotime($checkIn)) / 86400));
+    $days = max(1, (int)round((strtotime($checkOutDb) - strtotime($checkInDb)) / 86400));
     
     // Calcoliamo il costo degli extra selezionati
     $extras = $_POST['extras'] ?? [];
@@ -85,8 +88,8 @@ try {
     $ins->execute([
         $_SESSION['user']['id'],
         $roomId,
-        $checkIn,
-        $checkOut,
+        $checkInDb,
+        $checkOutDb,
         $totalPrice
     ]);
 

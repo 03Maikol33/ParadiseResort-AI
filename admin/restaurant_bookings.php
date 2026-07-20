@@ -76,7 +76,6 @@ try {
         $block->setContent('res_rows.date', date('d/m/Y', strtotime($r['reservation_date'])));
         $block->setContent('res_rows.slot', $r['meal_type'] === 'Pranzo' ? 'Pranzo' : 'Cena');
         $block->setContent('res_rows.guests', (string)$r['guests']);
-        $block->setContent('res_rows.notes', htmlspecialchars($r['special_requests'] ?? '-'));
         
         $badgeText = '';
         if ($r['status'] === 'Confirmed') {

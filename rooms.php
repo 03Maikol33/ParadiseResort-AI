@@ -7,6 +7,9 @@ $roomType = trim($_GET['room_type'] ?? '');
 $checkIn  = trim($_GET['check_in'] ?? '');
 $checkOut = trim($_GET['check_out'] ?? '');
 
+$checkInDb = preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $checkIn) ? DateTime::createFromFormat('d/m/Y', $checkIn)->format('Y-m-d') : $checkIn;
+$checkOutDb = preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $checkOut) ? DateTime::createFromFormat('d/m/Y', $checkOut)->format('Y-m-d') : $checkOut;
+
 $sql = 'SELECT * FROM room_categories WHERE 1=1';
 $params = [];
 
@@ -30,8 +33,8 @@ if ($checkIn !== '' && $checkOut !== '') {
             AND (check_in_date < :checkOut AND check_out_date > :checkIn)
         )
     )';
-    $params[':checkIn'] = $checkIn;
-    $params[':checkOut'] = $checkOut;
+    $params[':checkIn'] = $checkInDb;
+    $params[':checkOut'] = $checkOutDb;
 }
 
 $sql .= ' ORDER BY base_price ASC';
