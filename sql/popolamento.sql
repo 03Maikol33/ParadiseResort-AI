@@ -56,15 +56,15 @@ INSERT INTO room_categories (name, description, base_price, capacity, image_url)
 ('Presidential Suite', 'La massima espressione del lusso, vista mozzafiato, maggiordomo e piscina privata', 1200.00, 6, 'presidential_suite.jpg');
 
 INSERT INTO rooms (id, room_number, category_id, floor, status) VALUES
-(1, '101', 1, 1, 'disponibile'),
-(2, '102', 1, 1, 'da pulire'),
-(3, '201', 2, 2, 'disponibile'),
-(4, '202', 2, 2, 'disponibile'),
-(5, '301', 3, 3, 'disponibile'),
-(6, '302', 3, 3, 'in manutenzione'),
-(7, '401', 4, 4, 'disponibile'),
-(8, '402', 4, 4, 'disponibile'),
-(9, '501', 5, 5, 'disponibile');
+(1, '101', 1, 1, 'available'),
+(2, '102', 1, 1, 'cleaning'),
+(3, '201', 2, 2, 'available'),
+(4, '202', 2, 2, 'available'),
+(5, '301', 3, 3, 'available'),
+(6, '302', 3, 3, 'maintenance'),
+(7, '401', 4, 4, 'available'),
+(8, '402', 4, 4, 'available'),
+(9, '501', 5, 5, 'available');
 
 INSERT INTO booking_statuses (id, name) VALUES
 (1, 'In Cart'),
@@ -79,9 +79,9 @@ INSERT INTO ticket_statuses (id, name) VALUES
 (3, 'Resolved');
 
 INSERT INTO amenities (id, name, description, price, image_url, is_suspended) VALUES
-(1, '🧖‍♀️ Accesso SPA', 'Ingresso giornaliero al centro benessere esclusivo con saune e percorso termale', 35.00, 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80', 0),
-(2, '🥐 Colazione in Camera', 'Servizio premium in camera per la colazione continentale o all\'americana', 15.00, 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=800&q=80', 0),
-(3, '🚐 Navetta Aeroporto', 'Trasferimento privato di lusso da e per l\'aeroporto', 50.00, 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=800&q=80', 0);
+(1, 'Accesso SPA', 'Ingresso giornaliero al centro benessere esclusivo con saune e percorso termale', 35.00, 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80', 0),
+(2, 'Colazione in Camera', 'Servizio premium in camera per la colazione continentale o all\'americana', 15.00, 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=800&q=80', 0),
+(3, 'Navetta Aeroporto', 'Trasferimento privato di lusso da e per l\'aeroporto', 50.00, 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=800&q=80', 0);
 
 INSERT INTO bookings (id, user_id, room_id, status_id, check_in_date, check_out_date, total_price, staff_notes) VALUES
 (1, 3, 3, 5, '2026-06-10', '2026-06-15', 600.00, 'Ospite regolare, richiesto cuscino aggiuntivo'),

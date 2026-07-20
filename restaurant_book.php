@@ -10,7 +10,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $resDate = trim($_POST['reservation_date'] ?? '');
     $timeSlot = trim($_POST['time_slot'] ?? 'Dinner');
     $guestsCount = (int)($_POST['guests_count'] ?? 2);
-    $specialRequests = trim($_POST['special_requests'] ?? '');
 
     $today = date('Y-m-d');
     if ($resDate < $today || $guestsCount <= 0 || !in_array($timeSlot, ['Lunch', 'Dinner'])) {
@@ -28,8 +27,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 $error = 'Spiacenti, per il turno di ' . ($timeSlot === 'Lunch' ? 'Pranzo' : 'Cena') . ' del ' . date('d/m/Y', strtotime($resDate)) . ' abbiamo raggiunto la capienza massima (60 coperti). Seleziona un\'altra data o turno.';
             } else {
                 $resTime = ($timeSlot === 'Lunch') ? '13:00:00' : '20:00:00';
-                $ins = db()->prepare('INSERT INTO restaurant_reservations (user_id, reservation_date, meal_type, reservation_time, guests, special_requests, status) VALUES (?, ?, ?, ?, ?, ?, \'Confirmed\')');
-                $ins->execute([$userId, $resDate, $mealType, $resTime, $guestsCount, $specialRequests]);
+                $ins = db()->prepare('INSERT INTO restaurant_reservations (user_id, reservation_date, meal_type, reservation_time, guests, status) VALUES (?, ?, ?, ?, ?, \'Confirmed\')');
+                $ins->execute([$userId, $resDate, $mealType, $resTime, $guestsCount]);
                 $message = 'Tavolo per ' . $guestsCount . ' persone prenotato con successo per il ' . date('d/m/Y', strtotime($resDate)) . ' (' . ($timeSlot === 'Lunch' ? 'Pranzo' : 'Cena') . ')!';
             }
         } catch (Exception $e) {
@@ -63,7 +62,6 @@ try {
         $block->setContent('res_rows.date', date('d/m/Y', strtotime($r['reservation_date'])));
         $block->setContent('res_rows.slot', $r['meal_type'] === 'Pranzo' ? 'Pranzo (12:30 - 14:30)' : 'Cena (19:30 - 22:30)');
         $block->setContent('res_rows.guests', (string)$r['guests']);
-        $block->setContent('res_rows.notes', htmlspecialchars($r['special_requests'] ?: '-'));
         
         $badge = $r['status'] === 'Confirmed' ? 'badge badge-success py-2 px-3' : 'badge badge-danger py-2 px-3';
         $block->setContent('res_rows.status_badge', '<span class="' . $badge . '">' . htmlspecialchars($r['status']) . '</span>');

@@ -1,6 +1,6 @@
 <!-- Hero Title -->
 <div class="slider-area ">
-    <div class="single-slider hero-overly slider-height2 d-flex align-items-center" style="background-image: url('<[base]>/skins/customers/assets/img/hero/contact_hero.jpg'); background-size: cover; background-position: center;">
+    <div class="single-slider hero-overly slider-height2 d-flex align-items-center" style="background-image: url('<[base]>/skins/customers/assets/img/hero/ristorante_paradiseresort.jpg'); background-size: cover; background-position: center;">
         <div class="container">
             <div class="row justify-content-center text-center">
                 <div class="col-xl-9">
@@ -37,7 +37,7 @@
         <div class="row">
             <!-- Left Column: Table Reservation Form -->
             <div class="col-lg-5 mb-5 mb-lg-0">
-                <div class="card shadow-lg border-0 rounded p-4" style="background: #fff; border-top: 4px solid #d4af37 !important;">
+                <div class="card shadow-lg border-0 p-4" style="background: #fff; border-radius: 12px; border-left: 6px solid #dca73a !important;">
                     <h4 class="font-weight-bold mb-3 border-bottom pb-2"><i class="fas fa-utensils text-primary me-2"></i> Prenota per Pranzo o Cena</h4>
                     <p class="text-muted small mb-4">Seleziona la data, il turno e il numero di coperti. I tavoli con vista mare sono assegnati prioritariamente alle prenotazioni anticipate.</p>
 
@@ -70,12 +70,7 @@
                             </select>
                         </div>
 
-                        <div class="form-group mb-4">
-                            <label class="font-weight-bold small text-dark"><i class="fas fa-comment-dots text-primary me-1"></i> Richieste Speciali / Intolleranze</label>
-                            <textarea name="special_requests" class="form-control" rows="3" placeholder="Es. Tavolo vista mare, celiachia o allergie alimentari..."></textarea>
-                        </div>
-
-                        <button type="submit" class="btn btn1 w-100 py-3 font-weight-bold" style="font-size: 1.1rem;"><i class="fas fa-check me-2"></i> Conferma Prenotazione Tavolo</button>
+                        <button type="submit" class="btn btn1 w-100 py-3 font-weight-bold mt-4" style="font-size: 1.1rem;"><i class="fas fa-check me-2"></i> Conferma Prenotazione Tavolo</button>
                     </form>
                 </div>
             </div>
@@ -85,7 +80,6 @@
                 <div class="card shadow-sm border-0 rounded overflow-hidden">
                     <div class="card-header bg-dark text-white py-3 d-flex justify-content-between align-items-center">
                         <h5 class="mb-0 fw-bold text-white"><i class="fas fa-calendar-check me-2"></i> Le Mie Prenotazioni al Ristorante</h5>
-                        <span class="badge badge-primary">Capienza Max 60 Coperti</span>
                     </div>
                     <div class="card-body p-0">
                         <[ifempty has_res]>
@@ -97,16 +91,14 @@
                         <[/ifempty]>
 
                         <[if!empty has_res]>
-                            <div class="table-responsive">
+                            <div>
                                 <table class="table table-hover align-middle mb-0">
                                     <thead class="bg-light">
                                         <tr>
                                             <th class="ps-4">Data</th>
                                             <th>Turno</th>
                                             <th>Coperti</th>
-                                            <th>Note e Intolleranze</th>
-                                            <th>Stato</th>
-                                            <th class="text-end pe-4">Annulla</th>
+                                            <th class="text-end pe-4">Stato</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -115,9 +107,7 @@
                                             <td class="ps-4 font-weight-bold text-dark"><[res_rows.date]></td>
                                             <td><span class="badge badge-info text-dark py-1 px-2"><[res_rows.slot]></span></td>
                                             <td class="font-weight-bold"><[res_rows.guests]> Ospiti</td>
-                                            <td class="small text-muted" style="max-width: 180px;"><[res_rows.notes]></td>
-                                            <td><[res_rows.status_badge]></td>
-                                            <td class="text-end pe-4"><[res_rows.cancel_btn]></td>
+                                            <td class="text-end pe-4"><[res_rows.status_badge]></td>
                                         </tr>
                                         <[/foreach]>
                                     </tbody>
