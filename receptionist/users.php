@@ -24,8 +24,11 @@ try {
     $params = [];
 
     if ($search !== '') {
-        $sql .= ' AND (u.first_name LIKE :s OR u.last_name LIKE :s OR u.email LIKE :s OR u.phone LIKE :s)';
-        $params[':s'] = "%$search%";
+        $sql .= ' AND (u.first_name LIKE :s1 OR u.last_name LIKE :s2 OR u.email LIKE :s3 OR u.phone LIKE :s4)';
+        $params[':s1'] = "%$search%";
+        $params[':s2'] = "%$search%";
+        $params[':s3'] = "%$search%";
+        $params[':s4'] = "%$search%";
     }
 
     $sql .= ' ORDER BY u.last_name ASC, u.first_name ASC';

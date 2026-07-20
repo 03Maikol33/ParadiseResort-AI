@@ -49,7 +49,7 @@
     <aside class="admin-sidebar" id="adminSidebar" aria-label="Main navigation">
       <div class="sidebar-header">
         <a class="brand-mark" href="<[base]>/<[role_path]>/index.php">
-          <span class="brand-icon"><i class="bi bi-building text-primary"></i></span>
+          <span class="brand-icon"><i class="bi bi-building"></i></span>
           <span class="brand-copy">
             <span class="brand-title">ParadiseResort</span>
             <span class="brand-subtitle"><[user_role]> Area</span>
@@ -82,15 +82,15 @@
         </a>
 
         <[ifempty is_admin_role]>
-          <!-- VISTE ESCLUSIVE RECEPTIONIST (US-29, US-30) -->
+          <!-- VISTE ESCLUSIVE RECEPTIONIST-->
           <div class="px-3 py-2 text-uppercase text-muted" style="font-size: 0.7rem; font-weight: bold; margin-top: 10px;">Gestione Reception</div>
           <a class="nav-link" href="<[base]>/receptionist/users.php">
             <span class="nav-icon"><i class="bi bi-people"></i></span>
-            <span class="nav-text">Ricerca Clienti (US-29)</span>
+            <span class="nav-text">Ricerca Clienti</span>
           </a>
           <a class="nav-link" href="<[base]>/receptionist/rooms.php">
             <span class="nav-icon"><i class="bi bi-door-open"></i></span>
-            <span class="nav-text">Stato Stanze (US-30)</span>
+            <span class="nav-text">Stato Stanze</span>
           </a>
         <[/ifempty]>
 
@@ -155,11 +155,7 @@
     <div class="admin-main">
       <nav class="navbar admin-navbar navbar-expand bg-white">
         <div class="container-fluid px-3 px-lg-4">
-          <button class="sidebar-toggle" type="button" data-sidebar-toggle aria-controls="adminSidebar" aria-expanded="true" aria-label="Toggle sidebar">
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
+          
 
           <div class="d-none d-md-flex ms-3 flex-grow-1 align-items-center">
             <span class="text-muted fw-500"><i class="bi bi-clock-history me-1"></i> Area Operativa <[user_role]> - Resort Paradise</span>

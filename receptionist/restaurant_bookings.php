@@ -38,8 +38,8 @@ $block = new_block('restaurant_bookings');
 $block->setContent('message', $message);
 $block->setContent('error', $error);
 $block->setContent('val_date', htmlspecialchars($filterDate));
-$block->setContent('sel_lunch', $filterSlot === 'Pranzo' ? 'selected' : '');
-$block->setContent('sel_dinner', $filterSlot === 'Cena' ? 'selected' : '');
+$block->setContent('sel_lunch',  $filterSlot === 'Pranzo' ? 'selected' : '');
+$block->setContent('sel_dinner', $filterSlot === 'Cena'   ? 'selected' : '');
 
 try {
     $sql = '

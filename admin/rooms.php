@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $roomNumber = trim($_POST['room_number'] ?? '');
     $catId = (int)($_POST['room_category_id'] ?? 1);
     $floor = (int)($_POST['floor'] ?? 1);
-    $status = trim($_POST['status'] ?? 'Disponibile');
+    $status = trim($_POST['status'] ?? 'available');   // DB ENUM: available, cleaning, maintenance
 
     if ($roomNumber === '' || $catId <= 0) {
         $error = 'Numero Camera e Categoria sono obbligatori.';
@@ -94,20 +94,20 @@ try {
     $block->setContent('category_options', $catOptions);
     $block->setContent('filter_category_options', $filterCatOptions);
 
+    // DB ENUM values: available, cleaning, maintenance
     $statuses = [
-        'Disponibile' => 'Disponibile (Pulita)',
-        'Occupata' => 'Occupata (Dai Clienti)',
-        'Da Pulire' => 'Da Pulire',
-        'In Manutenzione' => 'In Manutenzione'
+        'available'   => 'Disponibile (Pulita)',
+        'cleaning'    => 'Da Pulire',
+        'maintenance' => 'In Manutenzione',
     ];
     $statusOptions = '';
     $filterStatusOptions = '';
     foreach ($statuses as $val => $label) {
         $selected = ($editRoom && $editRoom['status'] === $val) ? ' selected' : '';
         $statusOptions .= '<option value="' . $val . '"' . $selected . '>' . $label . '</option>';
-        
+
         $filterSelected = (isset($_GET['filter_status']) && $_GET['filter_status'] === $val) ? ' selected' : '';
-        $filterStatusOptions .= '<option value="' . $val . '"' . $filterSelected . '>' . htmlspecialchars($val) . '</option>';
+        $filterStatusOptions .= '<option value="' . $val . '"' . $filterSelected . '>' . htmlspecialchars($label) . '</option>';
     }
     $block->setContent('status_options', $statusOptions);
     $block->setContent('filter_status_options', $filterStatusOptions);
@@ -156,12 +156,17 @@ try {
         $block->setContent('room_list.category_name', htmlspecialchars($r['category_name']));
         $block->setContent('room_list.floor', (string)$r['floor']);
         
+        $statusLabels = [
+            'available'   => 'Disponibile',
+            'cleaning'    => 'Da Pulire',
+            'maintenance' => 'In Manutenzione',
+        ];
+        $italianLabel = $statusLabels[$dbStatus] ?? ucfirst($dbStatus);
         $badge = 'badge bg-success';
-        if ($dbStatus === 'In Manutenzione') $badge = 'badge bg-warning text-dark';
-        if ($dbStatus === 'Occupata') $badge = 'badge bg-danger';
-        if ($dbStatus === 'Da Pulire') $badge = 'badge bg-secondary';
-        
-        $block->setContent('room_list.status_badge', '<span class="' . $badge . '">' . htmlspecialchars($dbStatus) . '</span>');
+        if ($dbStatus === 'cleaning')    $badge = 'badge bg-secondary';
+        if ($dbStatus === 'maintenance') $badge = 'badge bg-warning text-dark';
+
+        $block->setContent('room_list.status_badge', '<span class="' . $badge . '">' . htmlspecialchars($italianLabel) . '</span>');
     }
 } catch (Exception $e) {
     $block->setContent('error', 'Errore DB: ' . $e->getMessage());
