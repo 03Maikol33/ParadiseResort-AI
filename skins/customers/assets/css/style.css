@@ -1881,10 +1881,10 @@ label {
   background-position: center center; }
 
 .btn1 {
-  padding: 25px 0px; }
+  padding: 25px 10px; }
   @media only screen and (min-width: 768px) and (max-width: 991px) {
     .btn1 {
-      padding: 25px 0; } }
+      padding: 25px 10px; } }
 
 .slider-area .h1-slider-caption h1 {
   font-size: 66px;
@@ -3675,7 +3675,7 @@ button {
 
 h1, h2, h3, h4, h5 {
   font-family: "Lato", sans-serif;
-  color: #191d34; }
+  color: #ffffff; }
 
 h1 a,
 h2 a,
