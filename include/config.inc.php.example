@@ -36,7 +36,7 @@ $config = [
         'port'    => 3306,
         'name'    => 'paradiseresort',
         'user'    => 'root',
-        'pass'    => 'root', // Inserire la password del proprio database MySQL locale
+        'pass'    => 'pass123', // Inserire la password del proprio database MySQL locale
         'charset' => 'utf8mb4',
     ],
 
