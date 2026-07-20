@@ -11,18 +11,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $resId = (int)($_POST['res_id'] ?? 0);
     $status = trim($_POST['status'] ?? 'Confirmed');
 
-    if ($resId > 0 && in_array($status, ['Confirmed', 'Cancelled'])) {
+    if ($resId > 0) {
         try {
-            $upd = db()->prepare('UPDATE restaurant_reservations SET status = ? WHERE id = ?');
-            $upd->execute([$status, $resId]);
-            $message = 'Stato della prenotazione tavolo #' . $resId . ' aggiornato con successo.';
+            if ($status === 'Cancelled') {
+                $del = db()->prepare('DELETE FROM restaurant_reservations WHERE id = ?');
+                $del->execute([$resId]);
+                $message = 'Prenotazione tavolo #' . $resId . ' eliminata con successo.';
+            } elseif ($status === 'Confirmed') {
+                $upd = db()->prepare('UPDATE restaurant_reservations SET status = ? WHERE id = ?');
+                $upd->execute(['Confirmed', $resId]);
+                $message = 'Stato della prenotazione tavolo #' . $resId . ' aggiornato a Confermata.';
+            }
         } catch (Exception $e) {
-            $error = 'Errore aggiornamento: ' . $e->getMessage();
+            $error = 'Errore: ' . $e->getMessage();
         }
     }
 }
 
-$filterDate = trim($_GET['date'] ?? date('Y-m-d'));
+$filterDate = trim($_GET['date'] ?? '');
 $filterSlot = trim($_GET['slot'] ?? '');
 
 $page = new_page('administration', 'frame-private');
@@ -32,8 +38,8 @@ $block = new_block('restaurant_bookings');
 $block->setContent('message', $message);
 $block->setContent('error', $error);
 $block->setContent('val_date', htmlspecialchars($filterDate));
-$block->setContent('sel_lunch', $filterSlot === 'Lunch' ? 'selected' : '');
-$block->setContent('sel_dinner', $filterSlot === 'Dinner' ? 'selected' : '');
+$block->setContent('sel_lunch', $filterSlot === 'Pranzo' ? 'selected' : '');
+$block->setContent('sel_dinner', $filterSlot === 'Cena' ? 'selected' : '');
 
 try {
     $sql = '
@@ -49,11 +55,11 @@ try {
         $params[':fDate'] = $filterDate;
     }
     if ($filterSlot !== '') {
-        $sql .= ' AND r.time_slot = :fSlot';
+        $sql .= ' AND r.meal_type = :fSlot';
         $params[':fSlot'] = $filterSlot;
     }
 
-    $sql .= ' ORDER BY r.time_slot DESC, r.created_at DESC';
+    $sql .= ' ORDER BY r.meal_type DESC, r.created_at DESC';
 
     $stmt = db()->prepare($sql);
     $stmt->execute($params);
@@ -68,16 +74,26 @@ try {
         $block->setContent('res_rows.guest_phone', htmlspecialchars($r['phone'] ?? '-'));
         $block->setContent('res_rows.guest_email', htmlspecialchars($r['email']));
         $block->setContent('res_rows.date', date('d/m/Y', strtotime($r['reservation_date'])));
-        $block->setContent('res_rows.slot', $r['time_slot'] === 'Lunch' ? 'Pranzo' : 'Cena');
-        $block->setContent('res_rows.guests', (string)$r['guests_count']);
+        $block->setContent('res_rows.slot', $r['meal_type'] === 'Pranzo' ? 'Pranzo' : 'Cena');
+        $block->setContent('res_rows.guests', (string)$r['guests']);
         $block->setContent('res_rows.notes', htmlspecialchars($r['special_requests'] ?? '-'));
         
-        $badge = $r['status'] === 'Confirmed' ? 'badge bg-success' : 'badge bg-danger';
-        $block->setContent('res_rows.status_badge', '<span class="' . $badge . '">' . htmlspecialchars($r['status']) . '</span>');
+        $badgeText = '';
+        if ($r['status'] === 'Confirmed') {
+            $badgeText = 'Confermata';
+            $badge = 'badge bg-success';
+        } elseif ($r['status'] === 'Pending') {
+            $badgeText = 'In Attesa';
+            $badge = 'badge bg-warning text-dark';
+        } else {
+            $badgeText = 'Cancellata';
+            $badge = 'badge bg-danger';
+        }
+        $block->setContent('res_rows.status_badge', '<span class="' . $badge . '">' . $badgeText . '</span>');
 
         if ($r['status'] === 'Confirmed') {
-            if ($r['time_slot'] === 'Lunch') $totalGuestsLunch += (int)$r['guests_count'];
-            if ($r['time_slot'] === 'Dinner') $totalGuestsDinner += (int)$r['guests_count'];
+            if ($r['meal_type'] === 'Pranzo') $totalGuestsLunch += (int)$r['guests'];
+            if ($r['meal_type'] === 'Cena') $totalGuestsDinner += (int)$r['guests'];
         }
     }
 

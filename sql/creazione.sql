@@ -55,7 +55,7 @@ CREATE TABLE rooms (
     room_number VARCHAR(10) UNIQUE NOT NULL,
     category_id INT NOT NULL,
     floor INT NOT NULL,
-    status ENUM('available', 'maintenance', 'cleaning') DEFAULT 'available',
+    status ENUM('Available', 'Occupied', 'Dirty', 'Maintenance') DEFAULT 'Available',
     FOREIGN KEY (category_id) REFERENCES room_categories(id) ON DELETE RESTRICT
 );
 
@@ -141,6 +141,7 @@ CREATE TABLE restaurant_reservations (
     meal_type ENUM('Pranzo', 'Cena') NOT NULL,
     reservation_time TIME NOT NULL,
     guests INT NOT NULL DEFAULT 1,
+    special_requests TEXT DEFAULT NULL,
     status ENUM('Pending', 'Confirmed', 'Cancelled') DEFAULT 'Pending',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE

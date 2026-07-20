@@ -33,6 +33,9 @@ $block->setContent('room.name', htmlspecialchars($cat['name']));
 $block->setContent('room.description', htmlspecialchars($cat['description'] ?? ''));
 $block->setContent('room.base_price', number_format((float)$cat['base_price'], 2, ',', '.'));
 $block->setContent('room.capacity', (string)$cat['capacity']);
+$imageUrl = !empty($cat['image_url']) ? $cat['image_url'] : 'deluxe_singola.jpg';
+$block->setContent('room.image_url', htmlspecialchars($imageUrl));
+
 $error   = trim($_GET['error'] ?? '');
 $message = trim($_GET['msg'] ?? '');
 $block->setContent('error', htmlspecialchars($error));

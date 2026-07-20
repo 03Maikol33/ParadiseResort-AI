@@ -57,13 +57,19 @@
 <!-- Search & Filter Bar -->
 <div class="card shadow-sm border-0 rounded mb-4 p-3 bg-white">
   <form action="<[base]>/receptionist/rooms.php" method="GET" class="row g-2 align-items-center">
-    <div class="col-md-6">
-      <div class="input-group">
-        <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
-        <input type="text" name="search" class="form-control border-start-0" placeholder="Cerca numero o categoria camera..." value="<[val_search]>">
-      </div>
-    </div>
     <div class="col-md-4">
+      <select name="filter_cat" class="form-select">
+        <option value="">Tutte le categorie</option>
+        <[filter_category_options]>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <select name="floor" class="form-select">
+        <option value="">Tutti i piani</option>
+        <[filter_floor_options]>
+      </select>
+    </div>
+    <div class="col-md-3">
       <select name="status" class="form-select">
         <option value="">Tutti gli stati</option>
         <option value="Available" <[sel_avail]>>Available (Disponibile)</option>
@@ -108,16 +114,10 @@
             </td>
             <td><[room_rows.status_badge]></td>
             <td class="text-end pe-4">
-              <form action="<[base]>/receptionist/rooms.php" method="POST" class="d-flex gap-1 justify-content-end">
+              <form action="<[base]>/receptionist/rooms.php" method="POST" class="d-flex gap-1 justify-content-end align-items-center">
                 <input type="hidden" name="action" value="change_room_status">
                 <input type="hidden" name="room_id" value="<[room_rows.id]>">
-                <select name="status" class="form-select form-select-sm" style="width: 145px;">
-                  <option value="Available" <[room_rows.sel_avail]>>Available (Pulita)</option>
-                  <option value="Dirty" <[room_rows.sel_dirty]>>Dirty (Da Pulire)</option>
-                  <option value="Occupied" <[room_rows.sel_occ]>>Occupied (Occupata)</option>
-                  <option value="Maintenance" <[room_rows.sel_maint]>>Maintenance</option>
-                </select>
-                <button type="submit" class="btn btn-sm btn-primary" title="Aggiorna"><i class="bi bi-check2"></i></button>
+                <[room_rows.action_form]>
               </form>
             </td>
           </tr>

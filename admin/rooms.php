@@ -30,9 +30,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         try {
             $dbStatus = $statusMap[$status] ?? 'available';
             if ($id > 0) {
-                $upd = db()->prepare('UPDATE rooms SET room_number = ?, category_id = ?, floor = ?, status = ? WHERE id = ?');
-                $upd->execute([$roomNumber, $catId, $floor, $dbStatus, $id]);
-                $message = 'Camera fis. #' . $id . ' aggiornata con successo.';
+                $chk = db()->prepare('SELECT id FROM rooms WHERE room_number = ? AND id != ?');
+                $chk->execute([$roomNumber, $id]);
+                if ($chk->fetch()) {
+                    $error = 'Esiste già un\'altra camera con questo numero (' . htmlspecialchars($roomNumber) . ').';
+                } else {
+                    $upd = db()->prepare('UPDATE rooms SET room_number = ?, category_id = ?, floor = ?, status = ? WHERE id = ?');
+                    $upd->execute([$roomNumber, $catId, $floor, $status, $id]);
+                    $message = 'Camera fis. #' . $id . ' aggiornata con successo.';
+                }
             } else {
                 $chk = db()->prepare('SELECT id FROM rooms WHERE room_number = ?');
                 $chk->execute([$roomNumber]);
@@ -66,21 +72,88 @@ $block = new_block('rooms');
 $block->setContent('message', $message);
 $block->setContent('error', $error);
 
+$editRoom = null;
+if (!empty($_GET['edit_id'])) {
+    $stmt = db()->prepare('SELECT * FROM rooms WHERE id = ?');
+    $stmt->execute([(int)$_GET['edit_id']]);
+    $editRoom = $stmt->fetch();
+}
+
+$block->setContent('form_room_id', $editRoom ? (string)$editRoom['id'] : '');
+$block->setContent('edit_id', $editRoom ? (string)$editRoom['id'] : '');
+
+$block->setContent('edit_room_number', $editRoom ? htmlspecialchars($editRoom['room_number']) : '');
+$block->setContent('edit_floor', $editRoom ? (string)$editRoom['floor'] : '1');
+$block->setContent('form_title', $editRoom ? 'Modifica Camera #' . $editRoom['id'] : 'Registra Nuova Camera');
+$block->setContent('btn_label', $editRoom ? 'Salva Modifiche' : 'Registra Stanza');
+
 try {
     $stmtCat = db()->query('SELECT id, name FROM room_categories ORDER BY id ASC');
     $categories = $stmtCat->fetchAll();
     $catOptions = '';
+    $filterCatOptions = '';
     foreach ($categories as $c) {
-        $catOptions .= '<option value="' . $c['id'] . '">' . htmlspecialchars($c['name']) . '</option>';
+        $selected = ($editRoom && $editRoom['category_id'] == $c['id']) ? ' selected' : '';
+        $catOptions .= '<option value="' . $c['id'] . '"' . $selected . '>' . htmlspecialchars($c['name']) . '</option>';
+        
+        $filterSelected = (isset($_GET['filter_cat']) && $_GET['filter_cat'] == $c['id']) ? ' selected' : '';
+        $filterCatOptions .= '<option value="' . $c['id'] . '"' . $filterSelected . '>' . htmlspecialchars($c['name']) . '</option>';
     }
     $block->setContent('category_options', $catOptions);
+    $block->setContent('filter_category_options', $filterCatOptions);
 
-    $stmtRooms = db()->query('
+    $statuses = [
+        'Available' => 'Available (Disponibile / Pulita)',
+        'Occupied' => 'Occupied (Occupata dai Clienti)',
+        'Dirty' => 'Dirty (Da Pulire)',
+        'Maintenance' => 'Maintenance (In Manutenzione / Guasto)'
+    ];
+    $statusOptions = '';
+    $filterStatusOptions = '';
+    foreach ($statuses as $val => $label) {
+        $selected = ($editRoom && $editRoom['status'] === $val) ? ' selected' : '';
+        $statusOptions .= '<option value="' . $val . '"' . $selected . '>' . $label . '</option>';
+        
+        $filterSelected = (isset($_GET['filter_status']) && $_GET['filter_status'] === $val) ? ' selected' : '';
+        $filterStatusOptions .= '<option value="' . $val . '"' . $filterSelected . '>' . htmlspecialchars($val) . '</option>';
+    }
+    $block->setContent('status_options', $statusOptions);
+    $block->setContent('filter_status_options', $filterStatusOptions);
+
+    $stmtFloors = db()->query('SELECT DISTINCT floor FROM rooms ORDER BY floor ASC');
+    $floors = $stmtFloors->fetchAll(PDO::FETCH_COLUMN);
+    $filterFloorOptions = '';
+    foreach ($floors as $f) {
+        $filterSelected = (isset($_GET['filter_floor']) && $_GET['filter_floor'] !== '' && $_GET['filter_floor'] == $f) ? ' selected' : '';
+        $filterFloorOptions .= '<option value="' . $f . '"' . $filterSelected . '>Piano ' . htmlspecialchars($f) . '</option>';
+    }
+    $block->setContent('filter_floor_options', $filterFloorOptions);
+
+    $sql = '
         SELECT r.*, rc.name as category_name
         FROM rooms r
         JOIN room_categories rc ON r.category_id = rc.id
-        ORDER BY r.floor ASC, r.room_number ASC
-    ');
+        WHERE 1=1
+    ';
+    $params = [];
+
+    if (!empty($_GET['filter_cat'])) {
+        $sql .= ' AND r.category_id = ?';
+        $params[] = (int)$_GET['filter_cat'];
+    }
+    if (!empty($_GET['filter_status'])) {
+        $sql .= ' AND r.status = ?';
+        $params[] = $_GET['filter_status'];
+    }
+    if (isset($_GET['filter_floor']) && $_GET['filter_floor'] !== '') {
+        $sql .= ' AND r.floor = ?';
+        $params[] = (int)$_GET['filter_floor'];
+    }
+
+    $sql .= ' ORDER BY r.floor ASC, r.room_number ASC';
+
+    $stmtRooms = db()->prepare($sql);
+    $stmtRooms->execute($params);
     $rooms = $stmtRooms->fetchAll();
 
     foreach ($rooms as $r) {
